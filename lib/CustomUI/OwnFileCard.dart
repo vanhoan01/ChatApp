@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 
 class OwnFileCard extends StatelessWidget {
@@ -11,6 +12,8 @@ class OwnFileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NetworkHandler networkHandler = NetworkHandler();
+    String url = networkHandler.getURL();
     return Align(
       alignment: Alignment.centerRight,
       child: Padding(
@@ -37,8 +40,8 @@ class OwnFileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Image.file(
-                    File(path),
+                  child: Image.network(
+                    "$url/uploads/$path",
                     fit: BoxFit.fitHeight,
                   ),
                 ),

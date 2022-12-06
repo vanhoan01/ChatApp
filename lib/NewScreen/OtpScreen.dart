@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:chatapp/NewScreen/EnterInformation.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({Key? key, this.number, this.countryCode}) : super(key: key);
@@ -12,6 +13,8 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+  OtpFieldController otpController = OtpFieldController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,14 +82,25 @@ class _OtpScreenState extends State<OtpScreen> {
               height: 5,
             ),
             OTPTextField(
+              controller: otpController,
               length: 6,
               width: MediaQuery.of(context).size.width,
               fieldWidth: 30,
               style: TextStyle(fontSize: 17),
               textFieldAlignment: MainAxisAlignment.spaceAround,
               fieldStyle: FieldStyle.underline,
+              onChanged: (pin) {
+                print("Changed: " + pin);
+              },
               onCompleted: (pin) {
-                print("Completed: " + pin);
+                //EnterInformation
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (builder) => EnterInformation(
+                        countryCode: widget.countryCode, number: widget.number),
+                  ),
+                );
               },
             ),
             SizedBox(

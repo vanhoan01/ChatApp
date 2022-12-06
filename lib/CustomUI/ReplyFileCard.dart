@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 
 class ReplyFileCard extends StatelessWidget {
@@ -12,6 +13,8 @@ class ReplyFileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NetworkHandler networkHandler = NetworkHandler();
+    String url = networkHandler.getURL();
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
@@ -36,28 +39,36 @@ class ReplyFileCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Image.network(
-                    "http://192.168.1.2:5000/uploads/$path",
+                    "${url}/uploads/$path",
                     fit: BoxFit.fitHeight,
                   ),
                 ),
-                message.length > 0
+                message.isNotEmpty
                     ? Container(
-                        height: 40,
+                        height: 28,
+                        // ignore: prefer_const_constructors
                         padding: EdgeInsets.only(
-                          left: 35,
+                          left: 8,
                           top: 8,
                         ),
                         child: Text(
                           message,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          // ignore: prefer_const_constructors
+                          style: TextStyle(fontSize: 16),
                         ),
                       )
                     : Container(),
+                Padding(
+                  padding: EdgeInsets.only(left: 163, bottom: 8),
+                  child: Text(
+                    time,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

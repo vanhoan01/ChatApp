@@ -1,5 +1,6 @@
 import 'package:chatapp/Model/ChatModel.dart';
-import 'package:chatapp/Pages/IndividualPage.dart';
+import 'package:chatapp/Screens/IndividualPage.dart';
+import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -11,31 +12,46 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String path = chatModel.avatarImage;
+    NetworkHandler networkHandler = NetworkHandler();
+    String url = networkHandler.getURL();
     return InkWell(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => IndividualPage(
-                      chatModel: chatModel,
-                      sourchat: sourchat,
-                    )));
+          context,
+          MaterialPageRoute(
+            builder: (context) => IndividualPage(
+              chatModel: chatModel,
+              sourchat: sourchat,
+            ),
+          ),
+        );
       },
       child: Column(
         children: [
           ListTile(
             leading: CircleAvatar(
               radius: 30,
-              child: SvgPicture.asset(
-                chatModel.isGroup ? 'assets/groups.svg' : 'assets/person.svg',
-                color: Colors.white,
-                height: 37,
-                width: 37,
-              ),
+              backgroundImage: path.isNotEmpty
+                  ? NetworkImage(
+                      "$url/uploads/$path",
+                    )
+                  : null,
+              // ignore: sort_child_properties_last
+              child: path.isEmpty
+                  ? SvgPicture.asset(
+                      chatModel.isGroup
+                          ? 'assets/groups.svg'
+                          : 'assets/person.svg',
+                      color: Colors.white,
+                      height: 37,
+                      width: 37,
+                    )
+                  : Container(),
               backgroundColor: Colors.blueGrey,
             ),
             title: Text(
-              chatModel.name,
+              chatModel.displayName,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -55,7 +71,7 @@ class CustomCard extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: Text(chatModel.time),
+            trailing: Text(chatModel.timestamp),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20, left: 80),

@@ -1,15 +1,14 @@
-import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/NewScreen/CallScreen.dart';
 import 'package:chatapp/Pages/CameraPage.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/Pages/StatusPage.dart';
+import 'package:chatapp/Screens/LoginScreen.dart';
+import 'package:chatapp/Screens/SearchScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Homescreen extends StatefulWidget {
-  Homescreen({Key? key, required this.chatmodels, required this.sourchat})
-      : super(key: key);
-  final List<ChatModel> chatmodels;
-  final ChatModel sourchat;
+  Homescreen({Key? key}) : super(key: key);
 
   @override
   State<Homescreen> createState() => _HomescreenState();
@@ -18,6 +17,8 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  final storage = FlutterSecureStorage();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -31,9 +32,20 @@ class _HomescreenState extends State<Homescreen>
       appBar: AppBar(
         title: Text('Whatsapp'),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+          IconButton(
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: SearchScreen(),
+              );
+            },
+            icon: const Icon(Icons.search),
+          ),
           PopupMenuButton<String>(
             onSelected: (value) {
+              if (value == "dangxuat") {
+                logout();
+              }
               print(value);
             },
             itemBuilder: (BuildContext context) {
@@ -58,6 +70,10 @@ class _HomescreenState extends State<Homescreen>
                   child: Text('Settings'),
                   value: 'Settings',
                 ),
+                PopupMenuItem(
+                  child: Text('Đăng xuất'),
+                  value: 'dangxuat',
+                ),
               ];
             },
           ),
@@ -77,14 +93,19 @@ class _HomescreenState extends State<Homescreen>
         controller: _tabController,
         children: [
           CameraPage(),
-          ChatPage(
-            chatmodels: widget.chatmodels,
-            sourchat: widget.sourchat,
-          ),
+          ChatPage(),
           StatusPage(),
           CallScreen(),
         ],
       ),
     );
+  }
+
+  void logout() async {
+    await storage.delete(key: "token");
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (route) => false);
   }
 }

@@ -1,22 +1,30 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part "ChatModel.g.dart";
+
+@JsonSerializable()
 class ChatModel {
-  late int id;
-  late String name;
-  late String icon;
+  late String userName;
+  late String displayName;
+  late String avatarImage;
   late bool isGroup;
-  late String time;
+  late String timestamp;
   late String currentMessage;
   late String status;
   late bool select = false;
 
   ChatModel({
-    required this.id,
-    required this.name,
-    required this.icon,
+    required this.userName,
+    required this.displayName,
+    required this.avatarImage,
     required this.isGroup,
-    required this.time,
+    required this.timestamp,
     required this.currentMessage,
   });
-  ChatModel.ChatModelContact(this.name, this.status);
+  ChatModel.ChatModelContact(this.displayName, this.status);
   ChatModel.ChatModelGroup(
-      {required this.name, required this.status, this.select = false});
+      {required this.displayName, required this.status, this.select = false});
+  factory ChatModel.fromJson(Map<String, dynamic> json) =>
+      _$ChatModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ChatModelToJson(this);
 }

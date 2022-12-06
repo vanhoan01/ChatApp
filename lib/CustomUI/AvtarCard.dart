@@ -47,7 +47,7 @@ class AvtarCard extends StatelessWidget {
             height: 2,
           ),
           Text(
-            contact.name,
+            contact.displayName,
             style: TextStyle(fontSize: 12),
           ),
         ],

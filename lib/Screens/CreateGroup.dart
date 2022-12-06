@@ -12,10 +12,11 @@ class CreateGroup extends StatefulWidget {
 
 class _CreateGroupState extends State<CreateGroup> {
   List<ChatModel> contacts = [
-    ChatModel.ChatModelGroup(name: 'Dev Stack', status: 'full stack'),
-    ChatModel.ChatModelGroup(name: 'Balram', status: 'Flutter developer'),
-    ChatModel.ChatModelGroup(name: 'Saket', status: 'Flutter developer'),
-    ChatModel.ChatModelGroup(name: 'Dev', status: 'Flutter developer'),
+    ChatModel.ChatModelGroup(displayName: 'Dev Stack', status: 'full stack'),
+    ChatModel.ChatModelGroup(
+        displayName: 'Balram', status: 'Flutter developer'),
+    ChatModel.ChatModelGroup(displayName: 'Saket', status: 'Flutter developer'),
+    ChatModel.ChatModelGroup(displayName: 'Dev', status: 'Flutter developer'),
   ];
   List<ChatModel> groups = [];
   @override

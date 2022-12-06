@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
             Expanded(child: Container()),
             InkWell(
               onTap: () {
-                if (_textEditingController.text.length < 10) {
+                if (_textEditingController.text.length < 9) {
                   showMydilogue1();
                 } else {
                   showMydilogue();

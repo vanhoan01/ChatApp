@@ -29,7 +29,23 @@ class _CameraScreenState extends State<CameraScreen> {
     // TODO: implement initState
     super.initState();
     _cameraController = CameraController(cameras[0], ResolutionPreset.high);
-    cameraValue = _cameraController.initialize();
+    cameraValue = _cameraController.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    }).catchError((Object e) {
+      if (e is CameraException) {
+        switch (e.code) {
+          case 'CameraAccessDenied':
+            print('User denied camera access.');
+            break;
+          default:
+            print('Handle other errors.');
+            break;
+        }
+      }
+    });
   }
 
   @override

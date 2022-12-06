@@ -1,18 +1,46 @@
 import 'package:camera/camera.dart';
+import 'package:chatapp/Pages/LoadingPage.dart';
 import 'package:chatapp/Screens/CameraScreen.dart';
+import 'package:chatapp/Screens/Homescreen.dart';
 import 'package:chatapp/Screens/LoginScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+// ignore: use_key_in_widget_constructors
+class MyApp extends StatefulWidget {
+  @override
+  // ignore: library_private_types_in_public_api
+  _MyAppState createState() => _MyAppState();
+}
 
-  // This widget is the root of your application.
+class _MyAppState extends State<MyApp> {
+  Widget page = LoadingPage();
+  final storage = const FlutterSecureStorage();
+  @override
+  void initState() {
+    super.initState();
+    checkLogin();
+  }
+
+  void checkLogin() async {
+    String? token = await storage.read(key: "token");
+    if (token != null) {
+      setState(() {
+        page = Homescreen();
+      });
+    } else {
+      setState(() {
+        page = const LoginScreen();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,10 +48,8 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'OpenSans',
-        primaryColor: Color(0xFF075E54),
-        // colorScheme:
-        //     ColorScheme.fromSwatch().copyWith(secondary: Color(0xFF128C7E)),
-        colorScheme: ColorScheme(
+        primaryColor: const Color(0xFF075E54),
+        colorScheme: const ColorScheme(
           brightness: Brightness.light,
           primary: Color(0xFF075E54),
           onPrimary: Colors.white,
@@ -37,7 +63,9 @@ class MyApp extends StatelessWidget {
           onError: Colors.white,
         ),
       ),
-      home: LoginScreen(),
+      home: page,
     );
   }
 }
+// chinh ip metwwork_handler.dart
+// flutter run lib/main.dart

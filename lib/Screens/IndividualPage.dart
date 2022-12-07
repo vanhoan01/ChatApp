@@ -41,7 +41,6 @@ class _IndividualPageState extends State<IndividualPage> {
   late String relationship = "";
 
   NetworkHandler networkHandler = NetworkHandler();
-  //"http://10.0.0.57:5000/"
   late String _url = "";
   ListChatMessagesModel listChatMessagesModel = ListChatMessagesModel();
 
@@ -97,10 +96,6 @@ class _IndividualPageState extends State<IndividualPage> {
     });
   }
 
-  Future<void> sendMessageDB(String text, String image) async {}
-
-  // enigmatic-crag-66260.herokuapp.com
-  // http://192.168.1.2:5000/
   void connect() {
     socket = IO.io(_url, <String, dynamic>{
       "transports": ["websocket"],
@@ -320,7 +315,9 @@ class _IndividualPageState extends State<IndividualPage> {
             child: WillPopScope(
               child: Column(
                 children: [
-                  relationship == "Bạn bè" ? Container() : ketBan(),
+                  relationship == "Bạn bè" || widget.chatModel.isGroup == true
+                      ? Container()
+                      : ketBan(),
                   Expanded(
                     // height: MediaQuery.of(context).size.height - 140,
                     child: ListView.builder(
@@ -524,6 +521,9 @@ class _IndividualPageState extends State<IndividualPage> {
   }
 
   Future<void> setRelationship(String userRela, String chatterRela) async {
+    var responseCheck = await networkHandler
+        .get("/user/checkrelationship/${widget.chatModel.userName}");
+    print(responseCheck['status']);
     var body = {
       "userName": widget.sourchat.userName,
       "relationship": {
@@ -531,8 +531,6 @@ class _IndividualPageState extends State<IndividualPage> {
         "typeStatus": userRela
       }
     };
-    var response = await networkHandler.post1("/user/add/relationship", body);
-    print(response);
     var body1 = {
       "userName": widget.chatModel.userName,
       "relationship": {
@@ -540,8 +538,20 @@ class _IndividualPageState extends State<IndividualPage> {
         "typeStatus": chatterRela
       }
     };
-    var response1 = await networkHandler.post1("/user/add/relationship", body1);
-    print(response1);
+    if (responseCheck['status'] == false) {
+      var response = await networkHandler.post1("/user/add/relationship", body);
+      print(response);
+      var response1 =
+          await networkHandler.post1("/user/add/relationship", body1);
+      print(response1);
+    } else {
+      var response =
+          await networkHandler.post1("/user/update/relationship", body);
+      print(response);
+      var response1 =
+          await networkHandler.post1("/user/update/relationship", body1);
+      print(response1);
+    }
   }
 
   Widget ketBan() {
@@ -556,13 +566,13 @@ class _IndividualPageState extends State<IndividualPage> {
           if (relationship == "Chấp nhận") {
             setRelationship("Bạn bè", "Bạn bè");
             setState(() {
-              relationship == "Bạn bè";
+              relationship = "Bạn bè";
             });
           } else {
             if (relationship == "Đã gửi lời mời kết bạn") {
               setRelationship("Người lạ", "Người lạ");
               setState(() {
-                relationship == "Kết bạn";
+                relationship = "Kết bạn";
               });
             }
           }

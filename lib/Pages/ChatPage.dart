@@ -3,6 +3,7 @@ import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/Model/ListChatModel.dart';
 import 'package:chatapp/Model/ListChatterModel.dart';
 import 'package:chatapp/Model/ListConversationModel.dart';
+import 'package:chatapp/Model/userModel.dart';
 import 'package:chatapp/Screens/SelectContact.dart';
 import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
@@ -100,12 +101,17 @@ class _ChatPageState extends State<ChatPage> {
     print(chatModelChatterConversation);
     chatModelChatterConversation
         .sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    var responseUser = await networkHandler.get("/user/getData");
+    UserModel userModel = UserModel.fromJson(responseUser);
+    print(userModel);
     setState(() {
       chatmodels = chatModelChatterConversation;
       sourceChat = ChatModel(
-          userName: 'hoan',
-          displayName: 'Văn Hoàn',
-          avatarImage: '',
+          userName: userModel.username,
+          displayName: userModel.displayName,
+          avatarImage:
+              userModel.avatarImage == null ? "" : userModel.avatarImage!,
           isGroup: false,
           timestamp: '03:00',
           currentMessage: 'currentMessage');

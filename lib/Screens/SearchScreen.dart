@@ -2,6 +2,7 @@ import 'package:chatapp/CustomUI/SearchItem.dart';
 import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/Model/ListChatterModel.dart';
 import 'package:chatapp/Model/ListConversationModel.dart';
+import 'package:chatapp/Model/userModel.dart';
 import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 
@@ -102,10 +103,13 @@ class SearchScreen extends SearchDelegate {
     // chatModelChatterConversation
     //     .sort((a, b) => b.timestamp.compareTo(a.timestamp));
     chatmodels = chatModelChatterConversation;
+    var responseUser = await networkHandler.get("/user/getData");
+    UserModel userModel = UserModel.fromJson(responseUser);
     sourceChat = ChatModel(
-        userName: 'hoan',
-        displayName: 'Văn Hoàn',
-        avatarImage: '',
+        userName: userModel.username,
+        displayName: userModel.displayName,
+        avatarImage:
+            userModel.avatarImage == null ? "" : userModel.avatarImage!,
         isGroup: false,
         timestamp: '03:00',
         currentMessage: 'currentMessage');
@@ -139,18 +143,20 @@ class SearchScreen extends SearchDelegate {
   // third overwrite to show query result
   @override
   Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    // for (var fruit in searchTerms) {
-    //   if (fruit.toLowerCase().contains(query.toLowerCase())) {
-    //     matchQuery.add(fruit);
-    //   }
-    // }
+    List<ChatModel> matchQuery = [];
+    if (query.trim().length > 0) {
+      fetchData(query.trim());
+      matchQuery = chatmodels;
+      print(matchQuery);
+    }
+
     return ListView.builder(
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
+        ChatModel chatModel = matchQuery[index];
+        return SearchItem(
+          chatModel: chatModel,
+          sourchat: sourceChat,
         );
       },
     );
@@ -162,10 +168,6 @@ class SearchScreen extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     List<ChatModel> matchQuery = [];
     if (query.trim().length > 0) {
-      print(query);
-      print(query);
-      print(query);
-      print(query);
       fetchData(query.trim());
       matchQuery = chatmodels;
       print(matchQuery);

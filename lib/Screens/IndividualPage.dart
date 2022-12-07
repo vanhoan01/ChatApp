@@ -89,6 +89,7 @@ class _IndividualPageState extends State<IndividualPage> {
     print(listChatMessages1);
     var relation = await networkHandler
         .get("/user/get/relationship/${widget.chatModel.userName}");
+    print(widget.chatModel.userName);
     print(relation);
     setState(() {
       messages = listChatMessages1!;
@@ -319,7 +320,7 @@ class _IndividualPageState extends State<IndividualPage> {
             child: WillPopScope(
               child: Column(
                 children: [
-                  relationship == "Bạn bè" ? Container() : ketBan(relationship),
+                  relationship == "Bạn bè" ? Container() : ketBan(),
                   Expanded(
                     // height: MediaQuery.of(context).size.height - 140,
                     child: ListView.builder(
@@ -522,10 +523,50 @@ class _IndividualPageState extends State<IndividualPage> {
     );
   }
 
-  Widget ketBan(String rela) {
+  Future<void> setRelationship(String userRela, String chatterRela) async {
+    var body = {
+      "userName": widget.sourchat.userName,
+      "relationship": {
+        "userName": widget.chatModel.userName,
+        "typeStatus": userRela
+      }
+    };
+    var response = await networkHandler.post1("/user/add/relationship", body);
+    print(response);
+    var body1 = {
+      "userName": widget.chatModel.userName,
+      "relationship": {
+        "userName": widget.sourchat.userName,
+        "typeStatus": chatterRela
+      }
+    };
+    var response1 = await networkHandler.post1("/user/add/relationship", body1);
+    print(response1);
+  }
+
+  Widget ketBan() {
     return InkWell(
-      onTap: () {
-        print("kb");
+      onTap: () async {
+        if (relationship == "Kết bạn") {
+          setRelationship("Đã gửi lời mời kết bạn", "Chấp nhận");
+          setState(() {
+            relationship = "Đã gửi lời mời kết bạn";
+          });
+        } else {
+          if (relationship == "Chấp nhận") {
+            setRelationship("Bạn bè", "Bạn bè");
+            setState(() {
+              relationship == "Bạn bè";
+            });
+          } else {
+            if (relationship == "Đã gửi lời mời kết bạn") {
+              setRelationship("Người lạ", "Người lạ");
+              setState(() {
+                relationship == "Kết bạn";
+              });
+            }
+          }
+        }
       },
       child: Container(
         color: Colors.white,
@@ -541,7 +582,7 @@ class _IndividualPageState extends State<IndividualPage> {
               width: 5,
             ),
             Text(
-              rela,
+              relationship == "Người lạ" ? "Kết bạn" : relationship,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,

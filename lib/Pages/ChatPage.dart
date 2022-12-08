@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:chatapp/CustomUI/CustomCard.dart';
 import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/Model/ListChatModel.dart';
@@ -9,6 +11,7 @@ import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
+  // ignore: prefer_const_constructors_in_immutables
   ChatPage({Key? key}) : super(key: key);
 
   @override
@@ -22,32 +25,7 @@ class _ChatPageState extends State<ChatPage> {
   ListConversationModel listConversationModel = ListConversationModel();
   late ChatModel sourceChat;
   late final String url;
-  List<ChatModel> chatmodels = [
-    // ChatModel(
-    //   id: 1,
-    //   name: 'Dev Stack',
-    //   isGroup: false,
-    //   currentMessage: 'Hi everyone',
-    //   time: '01:00',
-    //   icon: 'person.svg',
-    // ),
-    // ChatModel(
-    //   id: 2,
-    //   name: 'Kishor',
-    //   isGroup: false,
-    //   currentMessage: 'Hi Kishor',
-    //   time: '02:00',
-    //   icon: 'person.svg',
-    // ),
-    // ChatModel(
-    //   id: 3,
-    //   name: 'Collins',
-    //   isGroup: false,
-    //   currentMessage: 'Hi Collins',
-    //   time: '03:00',
-    //   icon: 'person.svg',
-    // ),
-  ];
+  List<ChatModel> chatmodels = [];
   @override
   void initState() {
     super.initState();
@@ -73,9 +51,8 @@ class _ChatPageState extends State<ChatPage> {
         chatModelChatter.add(chatModel);
       }
     }
+    // ignore: avoid_print
     print(chatModelChatter);
-    // Map<String, String> data = {};
-    // listChatModel = ListChatModel.fromJson(responseChatters);
     var responseConversations =
         await networkHandler.get("/user/get/conversations");
     List<ChatModel> chatModelConversation = [];
@@ -98,12 +75,14 @@ class _ChatPageState extends State<ChatPage> {
     List<ChatModel> chatModelChatterConversation = [];
     chatModelChatterConversation = chatModelChatter;
     chatModelChatterConversation.addAll(chatModelConversation);
+    // ignore: avoid_print
     print(chatModelChatterConversation);
     chatModelChatterConversation
         .sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     var responseUser = await networkHandler.get("/user/getData");
     UserModel userModel = UserModel.fromJson(responseUser);
+    // ignore: avoid_print
     print(userModel);
     setState(() {
       chatmodels = chatModelChatterConversation;
@@ -120,19 +99,18 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // sourceChat = chatmodels.removeAt(0);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
               MaterialPageRoute(builder: (builder) => SelectContact()));
         },
-        child: Icon(
+        child: const Icon(
           Icons.chat,
           color: Colors.white,
         ),
       ),
-      body: chatmodels.length > 0
+      body: chatmodels.isNotEmpty
           ? ListView.builder(
               itemBuilder: (context, index) => CustomCard(
                 chatModel: chatmodels[index],
@@ -144,32 +122,41 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget invite_friends() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10.0),
       child: Column(
         children: [
-          Text("Mời bạn bè"),
+          const Text("Mời bạn bè"),
+          // ignore: prefer_const_constructors
           Text(
-              "Hiện tại bạn không có bạn bè nào. Hãy dùng nút bên dưới để mời họ sử dụng"),
+            "Hiện tại bạn không có bạn bè nào. Hãy dùng nút bên dưới để mời họ sử dụng",
+            textAlign: TextAlign.center,
+          ),
           TextButton(
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
               overlayColor: MaterialStateProperty.resolveWith<Color?>(
                 (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.hovered))
+                  if (states.contains(MaterialState.hovered)) {
                     return Colors.blue.withOpacity(0.04);
+                  }
                   if (states.contains(MaterialState.focused) ||
-                      states.contains(MaterialState.pressed))
+                      states.contains(MaterialState.pressed)) {
                     return Colors.blue.withOpacity(0.12);
+                  }
                   return null; // Defer to the widget's default.
                 },
               ),
             ),
             onPressed: () {},
-            child: Text('Mời bạn bè'),
+            child: const Text('Mời bạn bè'),
           ),
-          Text("Trò chuyện với bạn bè của bạn sử dụng WhatsApp"),
+          const Text(
+            "Trò chuyện với bạn bè của bạn sử dụng ChatApp",
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

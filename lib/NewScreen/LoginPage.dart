@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          "Enter your phone number ",
+          "Nhập số điện thoại của bạn",
           style: TextStyle(
             color: Colors.teal,
             fontWeight: FontWeight.w700,
@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             Text(
-              "Whatsapp will send an sms message to vertify your number",
+              "Whatsapp sẽ gửi tin nhắn sms để xác minh số của bạn",
               style: TextStyle(
                 fontSize: 13.5,
               ),
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
               height: 5,
             ),
             Text(
-              "What's my number?",
+              "Số của bạn là gì?",
               style: TextStyle(
                 fontSize: 12.8,
                 color: Colors.cyan[800],
@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: 70,
                 child: Center(
                   child: Text(
-                    "NEXT",
+                    "TIẾP",
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -197,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(11.5),
                 //8
-                hintText: "phone number",
+                hintText: "số điện thoại",
               ),
             ),
           ),
@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "We  will be veryfying your phone Number",
+                  "Chúng tôi sẽ xác minh số điện thoại của bạn",
                   style: TextStyle(fontSize: 14),
                 ),
                 SizedBox(
@@ -242,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 10,
                 ),
                 Text(
-                  "Is this Ok, or would you like edit the number?",
+                  "Điều này có ổn không, hoặc bạn muốn chỉnh sửa số?",
                   style: TextStyle(fontSize: 13.5),
                 ),
               ],
@@ -285,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "There is no number you enter",
+                  "Không có số bạn nhập",
                   style: TextStyle(fontSize: 14),
                 ),
               ],

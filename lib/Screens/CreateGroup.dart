@@ -1,6 +1,8 @@
 import 'package:chatapp/CustomUI/AvtarCard.dart';
 import 'package:chatapp/CustomUI/ContactCard.dart';
 import 'package:chatapp/Model/ChatModel.dart';
+import 'package:chatapp/Screens/NewGroup.dart';
+import 'package:chatapp/Screens/SearchScreen.dart';
 import 'package:flutter/material.dart';
 
 class CreateGroup extends StatefulWidget {
@@ -28,14 +30,14 @@ class _CreateGroupState extends State<CreateGroup> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'New Group',
+              'Nhóm mới',
               style: TextStyle(
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              'Add participants',
+              'Thêm người tham gia',
               style: TextStyle(
                 fontSize: 13,
               ),
@@ -44,7 +46,12 @@ class _CreateGroupState extends State<CreateGroup> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: SearchScreen(),
+              );
+            },
             icon: Icon(
               Icons.search,
               size: 26,
@@ -113,6 +120,18 @@ class _CreateGroupState extends State<CreateGroup> {
                 )
               : Container(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (builder) => NewGroup(groups: groups),
+            ),
+          );
+        },
+        backgroundColor: const Color(0xFF128C7E),
+        child: const Icon(Icons.arrow_forward),
       ),
     );
   }

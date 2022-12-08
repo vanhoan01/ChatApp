@@ -275,6 +275,12 @@ class _IndividualPageState extends State<IndividualPage> {
                 icon: const Icon(Icons.call),
               ),
               PopupMenuButton<String>(
+                offset: const Offset(-20, 45),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                ),
                 onSelected: (value) {
                   print(value);
                 },

@@ -2,6 +2,7 @@ import 'package:chatapp/CustomUI/ButtonCard.dart';
 import 'package:chatapp/CustomUI/ContactCard.dart';
 import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/Screens/CreateGroup.dart';
+import 'package:chatapp/Screens/SearchScreen.dart';
 import 'package:flutter/material.dart';
 
 class SelectContact extends StatefulWidget {
@@ -27,14 +28,14 @@ class _SelectContactState extends State<SelectContact> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Select Contact',
+              'Chọn liên hệ',
               style: TextStyle(
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              '265contacts',
+              '265 liên hệ',
               style: TextStyle(
                 fontSize: 13,
               ),
@@ -43,32 +44,43 @@ class _SelectContactState extends State<SelectContact> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: SearchScreen(),
+              );
+            },
             icon: Icon(
               Icons.search,
               size: 26,
             ),
           ),
           PopupMenuButton<String>(
+            offset: const Offset(-20, 45),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
             onSelected: (value) {
               print(value);
             },
             itemBuilder: (BuildContext context) {
               return [
                 PopupMenuItem(
-                  child: Text('Invite a friend'),
+                  child: Text('Mời một người bạn'),
                   value: 'Invite a friend',
                 ),
                 PopupMenuItem(
-                  child: Text('Contacts'),
+                  child: Text('Các liên hệ'),
                   value: 'Contacts',
                 ),
                 PopupMenuItem(
-                  child: Text('Refresh'),
+                  child: Text('Làm mới'),
                   value: 'Refresh',
                 ),
                 PopupMenuItem(
-                  child: Text('Help'),
+                  child: Text('Trợ giúp'),
                   value: 'Help',
                 ),
               ];
@@ -86,10 +98,17 @@ class _SelectContactState extends State<SelectContact> {
                     MaterialPageRoute(builder: (builder) => CreateGroup()));
                 // print('hihi');
               },
-              child: ButtonCard(icon: Icons.group, name: 'New group'),
+              child: ButtonCard(icon: Icons.group, name: 'Nhóm mới'),
             );
           } else if (index == 1) {
-            return ButtonCard(icon: Icons.person, name: 'New contact');
+            return InkWell(
+                onTap: () {
+                  showSearch(
+                    context: context,
+                    delegate: SearchScreen(),
+                  );
+                },
+                child: ButtonCard(icon: Icons.person, name: 'Liên hệ mới'));
           }
           return ContactCard(contact: contacts[index - 2]);
         },

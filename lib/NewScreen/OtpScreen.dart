@@ -54,7 +54,7 @@ class _OtpScreenState extends State<OtpScreen> {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: "We have sent an SMS with a code to ",
+                    text: "Chúng tôi đã gửi một tin nhắn SMS có mã đến ",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 14.5,
@@ -69,7 +69,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                   ),
                   TextSpan(
-                    text: " Wrong number?",
+                    text: " Sai số?",
                     style: TextStyle(
                       color: Colors.cyan[800],
                       fontSize: 14.5,
@@ -107,7 +107,7 @@ class _OtpScreenState extends State<OtpScreen> {
               height: 30,
             ),
             Text(
-              "Enter 6-digit code",
+              "Nhập mã 6 chữ số",
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
@@ -116,7 +116,7 @@ class _OtpScreenState extends State<OtpScreen> {
             SizedBox(
               height: 30,
             ),
-            bottomButton("Resend SMS", Icons.message),
+            bottomButton("Gửi lại tin nhắn SMS", Icons.message),
             SizedBox(
               height: 12,
             ),
@@ -126,7 +126,7 @@ class _OtpScreenState extends State<OtpScreen> {
             SizedBox(
               height: 12,
             ),
-            bottomButton("Call Me", Icons.call),
+            bottomButton("Gọi cho tôi", Icons.call),
           ],
         ),
       ),

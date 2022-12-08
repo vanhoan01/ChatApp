@@ -1,7 +1,10 @@
+// ignore_for_file: file_names
+
 import 'package:chatapp/NewScreen/CallScreen.dart';
 import 'package:chatapp/Pages/CameraPage.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/Pages/StatusPage.dart';
+import 'package:chatapp/Screens/CreateGroup.dart';
 import 'package:chatapp/Screens/LoginScreen.dart';
 import 'package:chatapp/Screens/SearchScreen.dart';
 import 'package:flutter/material.dart';
@@ -42,32 +45,34 @@ class _HomescreenState extends State<Homescreen>
             icon: const Icon(Icons.search),
           ),
           PopupMenuButton<String>(
+            offset: const Offset(-20, 45),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
             onSelected: (value) {
               if (value == "dangxuat") {
                 logout();
+              }
+              if (value == "New group") {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (builder) => CreateGroup()));
               }
               print(value);
             },
             itemBuilder: (BuildContext context) {
               return [
                 PopupMenuItem(
-                  child: Text('New group'),
+                  child: Text('Tạo nhóm mới'),
                   value: 'New group',
                 ),
                 PopupMenuItem(
-                  child: Text('New broadcast'),
-                  value: 'New broadcast',
-                ),
-                PopupMenuItem(
-                  child: Text('Whatsapp Web'),
-                  value: 'Whatsapp Web',
-                ),
-                PopupMenuItem(
-                  child: Text('Starred messages'),
+                  child: Text('Tin nhắn quan trọng'),
                   value: 'Starred messages',
                 ),
                 PopupMenuItem(
-                  child: Text('Settings'),
+                  child: Text('Cài đặt'),
                   value: 'Settings',
                 ),
                 PopupMenuItem(
@@ -81,11 +86,12 @@ class _HomescreenState extends State<Homescreen>
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
+          labelPadding: EdgeInsets.all(2),
           tabs: [
             Tab(icon: Icon(Icons.camera_alt)),
-            Tab(text: "CHATS"),
-            Tab(text: "STATUS"),
-            Tab(text: "CALLS"),
+            Tab(text: "ĐOẠN CHAT"),
+            Tab(text: "TRẠNG THÁI"),
+            Tab(text: "CUỘC GỌI"),
           ],
         ),
       ),

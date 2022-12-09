@@ -22,8 +22,12 @@ class ChatModel {
     required this.currentMessage,
   });
   ChatModel.ChatModelContact(this.displayName, this.status);
-  ChatModel.ChatModelGroup(
-      {required this.displayName, required this.status, this.select = false});
+  ChatModel.ChatModelGroup({
+    required this.userName,
+    required this.displayName,
+    required this.status,
+    this.select = false,
+  });
   factory ChatModel.fromJson(Map<String, dynamic> json) =>
       _$ChatModelFromJson(json);
   Map<String, dynamic> toJson() => _$ChatModelToJson(this);

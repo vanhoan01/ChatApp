@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:convert';
 import 'package:chatapp/CustomUI/OwnFileCard.dart';
 import 'package:chatapp/CustomUI/OwnMessageCard.dart';
@@ -6,8 +8,10 @@ import 'package:chatapp/CustomUI/ReplyFileCard.dart';
 import 'package:chatapp/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/Model/ListChatMessagesModel.dart';
+import 'package:chatapp/Model/userModel.dart';
 import 'package:chatapp/Screens/CameraScreen.dart';
 import 'package:chatapp/Screens/CameraViewPage.dart';
+import 'package:chatapp/Screens/Homescreen.dart';
 import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +21,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
 
 class IndividualPage extends StatefulWidget {
-  const IndividualPage(
-      {Key? key, required this.chatModel, required this.sourchat})
-      : super(key: key);
+  const IndividualPage({Key? key, required this.chatModel}) : super(key: key);
   final ChatModel chatModel;
-  final ChatModel sourchat;
 
   @override
   State<IndividualPage> createState() => _IndividualPageState();
@@ -30,6 +31,7 @@ class IndividualPage extends StatefulWidget {
 class _IndividualPageState extends State<IndividualPage> {
   bool show = false;
   FocusNode focusNode = FocusNode();
+  ChatModel? sourceChat;
   late IO.Socket socket;
   final TextEditingController _textEditingController = TextEditingController();
   bool sendButton = false;
@@ -60,6 +62,8 @@ class _IndividualPageState extends State<IndividualPage> {
 
   @override
   void initState() {
+    fetchData();
+
     super.initState();
     _url = networkHandler.getURL();
     connect();
@@ -69,131 +73,6 @@ class _IndividualPageState extends State<IndividualPage> {
           show = false;
         });
       }
-    });
-    fetchData();
-  }
-
-  void fetchData() async {
-    Map<String, String> body = {"partition": widget.chatModel.userName};
-    var responseChatMessage =
-        await networkHandler.getpost("/chatmessage/get/messages", body);
-    List<ChatMessagesModel>? listChatMessages1 = [];
-    if (true) {
-      listChatMessagesModel =
-          ListChatMessagesModel.fromJson(responseChatMessage);
-      var listChatMessages = listChatMessagesModel.data;
-      print(listChatMessages);
-      listChatMessages1 = listChatMessages;
-    }
-    print(listChatMessages1);
-    var relation = await networkHandler
-        .get("/user/get/relationship/${widget.chatModel.userName}");
-    print(widget.chatModel.userName);
-    print(relation);
-    setState(() {
-      messages = listChatMessages1!;
-      relationship = relation.toString();
-    });
-  }
-
-  void connect() {
-    socket = IO.io(_url, <String, dynamic>{
-      "transports": ["websocket"],
-      "autoConnect": false,
-    });
-    socket.connect();
-    socket.emit("signin", widget.sourchat.userName);
-    socket.onConnect((data) {
-      print("Connected");
-      socket.on("message", (msg) {
-        print(msg);
-        setMessage(
-          msg["message"],
-          msg["path"],
-        );
-        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-      });
-    });
-    // ignore: avoid_print
-    print(socket.connected);
-  }
-
-  Future<void> sendMessage(String text, String image) async {
-    //database
-    Map<String, String> data = {
-      "author": widget.sourchat.userName,
-      "partition": widget.chatModel.userName,
-      "isGroup": widget.chatModel.isGroup.toString(),
-      "text": text,
-      "image": image
-    };
-    var responseSend = await networkHandler.post("/chatmessage/add", data);
-    print(responseSend);
-
-    //socket
-    setMessage(text, image);
-    socket.emit("message", {
-      "message": text,
-      "sourceId": widget.sourchat.userName,
-      "targetId": widget.chatModel.isGroup,
-      "path": image,
-    });
-  }
-
-  void onImageSend(String path, String message) async {
-    print("Hey there working $message");
-    for (var i = 0; i < popTime; i++) {
-      Navigator.pop(context);
-    }
-    setState(() {
-      popTime = 0;
-    });
-
-    //add Image
-    var request =
-        http.MultipartRequest("POST", Uri.parse("${_url}/image/addimage"));
-    request.files.add(await http.MultipartFile.fromPath("img", path));
-    request.headers.addAll({
-      "Content-type": "multipart/form-data",
-    });
-    http.StreamedResponse response = await request.send();
-    var httpResponse = await http.Response.fromStream(response);
-    var data = json.decode(httpResponse.body);
-    print(data['path']);
-
-    //send DB
-    Map<String, String> dataMap = {
-      "author": widget.sourchat.userName,
-      "partition": widget.chatModel.userName,
-      "isGroup": widget.chatModel.isGroup.toString(),
-      "text": message,
-      "image": data['path']
-    };
-    var responseSend = await networkHandler.post("/chatmessage/add", dataMap);
-    print(responseSend);
-
-    //send Socket
-    setMessage(message, path);
-    socket.emit("message", {
-      "message": message,
-      "sourceId": widget.sourchat.userName,
-      "targetId": widget.chatModel.userName,
-      "path": data['path'],
-    });
-  }
-
-  void setMessage(String text, String image) {
-    ChatMessagesModel messageModel = ChatMessagesModel(
-      author: widget.sourchat.userName,
-      partition: widget.chatModel.userName,
-      text: text,
-      image: image,
-      timestamp: DateTime.now(),
-      // DateTime.now().toString().substring(10, 16),
-    );
-    setState(() {
-      messages.insert(0, messageModel);
     });
   }
 
@@ -214,7 +93,10 @@ class _IndividualPageState extends State<IndividualPage> {
             titleSpacing: 0,
             leading: InkWell(
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => Homescreen()),
+                    (route) => false);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -337,8 +219,7 @@ class _IndividualPageState extends State<IndividualPage> {
                             height: 70,
                           );
                         }
-                        if (messages[index].author ==
-                            widget.sourchat.userName) {
+                        if (messages[index].author == sourceChat!.userName) {
                           if (messages[index].image.isNotEmpty) {
                             return OwnFileCard(
                               path: messages[index].image,
@@ -360,20 +241,30 @@ class _IndividualPageState extends State<IndividualPage> {
                         } else {
                           if (messages[index].image.isNotEmpty) {
                             return ReplyFileCard(
+                              avartar: widget.chatModel.isGroup
+                                  ? getAvartar(messages[index].author)
+                                      .toString()
+                                  : widget.chatModel.avatarImage,
                               path: messages[index].image,
                               message: messages[index].text,
                               time: messages[index]
                                   .timestamp
                                   .toString()
                                   .substring(10, 16),
+                              isGroup: widget.chatModel.isGroup,
                             );
                           } else {
                             return ReplyCard(
+                              path: widget.chatModel.isGroup
+                                  ? getAvartar(messages[index].author)
+                                      .toString()
+                                  : widget.chatModel.avatarImage,
                               message: messages[index].text,
                               time: messages[index]
                                   .timestamp
                                   .toString()
                                   .substring(10, 16),
+                              isGroup: widget.chatModel.isGroup,
                             );
                           }
                         }
@@ -526,12 +417,161 @@ class _IndividualPageState extends State<IndividualPage> {
     );
   }
 
+  Future<String> getAvartar(String userName) async {
+    var responseAvartar = await networkHandler.get("/user/get/image/$userName");
+    // ignore: unnecessary_null_comparison
+    if (responseAvartar.toString() == null) {
+      return "";
+    }
+    return responseAvartar.toString();
+  }
+
+  void fetchData() async {
+    var responseUser = await networkHandler.get("/user/getData");
+    UserModel userModel = UserModel.fromJson(responseUser);
+    print(userModel);
+    setState(() {
+      sourceChat = ChatModel(
+          userName: userModel.username,
+          displayName: userModel.displayName,
+          avatarImage:
+              userModel.avatarImage == null ? "" : userModel.avatarImage!,
+          isGroup: false,
+          timestamp: '03:00',
+          currentMessage: 'currentMessage');
+    });
+    Map<String, String> body = {"partition": widget.chatModel.userName};
+    String urlChat = widget.chatModel.isGroup
+        ? "/chatmessage/get/messagesgroup"
+        : "/chatmessage/get/messages";
+    var responseChatMessage = await networkHandler.getpost(urlChat, body);
+    List<ChatMessagesModel>? listChatMessages1 = [];
+    if (true) {
+      listChatMessagesModel =
+          ListChatMessagesModel.fromJson(responseChatMessage);
+      var listChatMessages = listChatMessagesModel.data;
+      print(listChatMessages);
+      listChatMessages1 = listChatMessages;
+    }
+    print(listChatMessages1);
+    var relation = await networkHandler
+        .get("/user/get/relationship/${widget.chatModel.userName}");
+    print(widget.chatModel.userName);
+    print(relation);
+
+    setState(() {
+      messages = listChatMessages1!;
+      relationship = relation.toString();
+    });
+  }
+
+  Future<void> connect() async {
+    socket = IO.io(_url, <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
+    await socket.connect();
+    socket.emit("signin", sourceChat!.userName);
+    socket.onConnect((data) {
+      print("Connected");
+      socket.on("message", (msg) {
+        print(msg);
+        setMessage(
+          msg["message"],
+          msg["path"],
+        );
+        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      });
+    });
+    // ignore: avoid_print
+    print(socket.connected);
+  }
+
+  Future<void> sendMessage(String text, String image) async {
+    //database
+    Map<String, String> data = {
+      "author": sourceChat!.userName,
+      "partition": widget.chatModel.userName,
+      "isGroup": widget.chatModel.isGroup.toString(),
+      "text": text,
+      "image": image
+    };
+    var responseSend = await networkHandler.post("/chatmessage/add", data);
+    print(responseSend);
+
+    //socket
+    setMessage(text, image);
+    socket.emit("message", {
+      "message": text,
+      "sourceId": sourceChat!.userName,
+      "targetId": widget.chatModel.isGroup,
+      "path": image,
+    });
+  }
+
+  void onImageSend(String path, String message) async {
+    print("Hey there working $message");
+    for (var i = 0; i < popTime; i++) {
+      Navigator.pop(context);
+    }
+    setState(() {
+      popTime = 0;
+    });
+
+    //add Image
+    var request =
+        http.MultipartRequest("POST", Uri.parse("${_url}/image/addimage"));
+    request.files.add(await http.MultipartFile.fromPath("img", path));
+    request.headers.addAll({
+      "Content-type": "multipart/form-data",
+    });
+    http.StreamedResponse response = await request.send();
+    var httpResponse = await http.Response.fromStream(response);
+    var data = json.decode(httpResponse.body);
+    print(data['path']);
+
+    //send DB
+    Map<String, String> dataMap = {
+      "author": sourceChat!.userName,
+      "partition": widget.chatModel.userName,
+      "isGroup": widget.chatModel.isGroup.toString(),
+      "text": message,
+      "image": data['path']
+    };
+    var responseSend = await networkHandler.post("/chatmessage/add", dataMap);
+    print(responseSend);
+
+    //send Socket
+    setMessage(message, path);
+    socket.emit("message", {
+      "message": message,
+      "sourceId": sourceChat!.userName,
+      "targetId": widget.chatModel.userName,
+      "path": data['path'],
+    });
+  }
+
+  void setMessage(String text, String image) {
+    ChatMessagesModel messageModel = ChatMessagesModel(
+      author: sourceChat!.userName,
+      partition: widget.chatModel.userName,
+      text: text,
+      image: image,
+      timestamp: DateTime.now(),
+      // DateTime.now().toString().substring(10, 16),
+    );
+    setState(() {
+      messages.insert(0, messageModel);
+    });
+  }
+
   Future<void> setRelationship(String userRela, String chatterRela) async {
     var responseCheck = await networkHandler
         .get("/user/checkrelationship/${widget.chatModel.userName}");
     print(responseCheck['status']);
     var body = {
-      "userName": widget.sourchat.userName,
+      "userName": sourceChat!.userName,
       "relationship": {
         "userName": widget.chatModel.userName,
         "typeStatus": userRela
@@ -540,7 +580,7 @@ class _IndividualPageState extends State<IndividualPage> {
     var body1 = {
       "userName": widget.chatModel.userName,
       "relationship": {
-        "userName": widget.sourchat.userName,
+        "userName": sourceChat!.userName,
         "typeStatus": chatterRela
       }
     };

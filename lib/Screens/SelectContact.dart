@@ -1,8 +1,12 @@
+// ignore_for_file: file_names
+
 import 'package:chatapp/CustomUI/ButtonCard.dart';
 import 'package:chatapp/CustomUI/ContactCard.dart';
-import 'package:chatapp/Model/ChatModel.dart';
+import 'package:chatapp/Model/ChatterModel.dart';
+import 'package:chatapp/Model/ListChatterModel.dart';
 import 'package:chatapp/Screens/CreateGroup.dart';
 import 'package:chatapp/Screens/SearchScreen.dart';
+import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 
 class SelectContact extends StatefulWidget {
@@ -13,20 +17,47 @@ class SelectContact extends StatefulWidget {
 }
 
 class _SelectContactState extends State<SelectContact> {
+  NetworkHandler networkHandler = NetworkHandler();
+  List<ChatterModel> contacts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    var responseChatters = await networkHandler.get("/user/get/friends");
+    var listChatterModel = ListChatterModel.fromJson(responseChatters);
+    var listChatters = listChatterModel.data;
+
+    List<ChatterModel> listCM = [];
+    ChatterModel chatterModel;
+
+    for (var i = 0; i < listChatters!.length; i = i + 1) {
+      chatterModel = ChatterModel(
+          userName: listChatters.elementAt(i).userName,
+          displayName: listChatters.elementAt(i).displayName,
+          avatarImage: listChatters.elementAt(i).avatarImage.toString(),
+          precense: listChatters.elementAt(i).precense,
+          select: false);
+      listCM.add(chatterModel);
+    }
+    // ignore: avoid_print
+    print(listCM);
+    setState(() {
+      contacts = listCM;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<ChatModel> contacts = [
-      ChatModel.ChatModelContact('Dev Stack', 'full stack'),
-      ChatModel.ChatModelContact('Balram', 'Flutter developer'),
-      ChatModel.ChatModelContact('Saket', 'Flutter developer'),
-      ChatModel.ChatModelContact('Dev', 'Flutter developer'),
-    ];
     return Scaffold(
       appBar: AppBar(
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: const [
             Text(
               'Chọn liên hệ',
               style: TextStyle(
@@ -50,7 +81,7 @@ class _SelectContactState extends State<SelectContact> {
                 delegate: SearchScreen(),
               );
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.search,
               size: 26,
             ),
@@ -63,25 +94,26 @@ class _SelectContactState extends State<SelectContact> {
               ),
             ),
             onSelected: (value) {
+              // ignore: avoid_print
               print(value);
             },
             itemBuilder: (BuildContext context) {
               return [
-                PopupMenuItem(
-                  child: Text('Mời một người bạn'),
+                const PopupMenuItem(
                   value: 'Invite a friend',
+                  child: Text('Mời một người bạn'),
                 ),
-                PopupMenuItem(
-                  child: Text('Các liên hệ'),
+                const PopupMenuItem(
                   value: 'Contacts',
+                  child: Text('Các liên hệ'),
                 ),
-                PopupMenuItem(
-                  child: Text('Làm mới'),
+                const PopupMenuItem(
                   value: 'Refresh',
+                  child: Text('Làm mới'),
                 ),
-                PopupMenuItem(
-                  child: Text('Trợ giúp'),
+                const PopupMenuItem(
                   value: 'Help',
+                  child: Text('Trợ giúp'),
                 ),
               ];
             },

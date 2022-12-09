@@ -6,9 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class SearchItem extends StatelessWidget {
   final ChatModel chatModel;
-  final ChatModel sourchat;
-  const SearchItem({Key? key, required this.chatModel, required this.sourchat})
-      : super(key: key);
+  const SearchItem({Key? key, required this.chatModel}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +18,7 @@ class SearchItem extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => IndividualPage(
-                      chatModel: chatModel,
-                      sourchat: sourchat,
-                    )));
+                builder: (context) => IndividualPage(chatModel: chatModel)));
       },
       child: Column(
         children: [

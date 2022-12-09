@@ -83,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                           // obscureText: vis,
+                          obscureText: true,
                           decoration: InputDecoration(
                             hintText: "Mật khẩu",
                             enabledBorder: UnderlineInputBorder(

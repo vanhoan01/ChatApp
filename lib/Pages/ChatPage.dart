@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:convert';
+
 import 'package:chatapp/CustomUI/CustomCard.dart';
 import 'package:chatapp/Model/ChatModel.dart';
 import 'package:chatapp/Model/ListChatModel.dart';
@@ -26,6 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   late ChatModel sourceChat;
   late final String url;
   List<ChatModel> chatmodels = [];
+
   @override
   void initState() {
     super.initState();
@@ -41,13 +44,23 @@ class _ChatPageState extends State<ChatPage> {
       ChatModel chatModel;
 
       for (var i = 0; i < listChatters!.length; i = i + 1) {
+        var last = await networkHandler.get(
+            "/chatmessage/get/lastmesage/${listChatters.elementAt(i).userName}");
+        String timestamp = "";
+        String currentMessage = "";
+        if (last != null) {
+          timestamp = last['timestamp'];
+          currentMessage =
+              last['image'].isNotEmpty ? "Đã gửi một hình ảnh" : last['text'];
+        }
+        print(listChatters.elementAt(i).userName);
         chatModel = ChatModel(
             userName: listChatters.elementAt(i).userName,
             displayName: listChatters.elementAt(i).displayName,
             avatarImage: listChatters.elementAt(i).avatarImage.toString(),
             isGroup: false,
-            timestamp: '03:00',
-            currentMessage: 'currentMessage');
+            timestamp: timestamp,
+            currentMessage: currentMessage);
         chatModelChatter.add(chatModel);
       }
     }
@@ -62,13 +75,21 @@ class _ChatPageState extends State<ChatPage> {
       var listConversations = listConversationModel.data;
       ChatModel chatModel;
       for (var i = 0; i < listConversations!.length; i = i + 1) {
+        var last = await networkHandler.get(
+            "/chatmessage/get/lastmesagegroup/${listConversations.elementAt(i).id}");
+        String timestamp = "";
+        String currentMessage = "";
+        if (last != null) {
+          timestamp = last['timestamp'];
+          currentMessage = last['image'].isNotEmpty ? "Hình ảnh" : last['text'];
+        }
         chatModel = ChatModel(
             userName: listConversations.elementAt(i).id,
             displayName: listConversations.elementAt(i).displayName,
-            avatarImage: '',
+            avatarImage: listConversations.elementAt(i).avatarImage,
             isGroup: true,
-            timestamp: '04:00',
-            currentMessage: 'currentMessage');
+            timestamp: timestamp,
+            currentMessage: currentMessage);
         chatModelConversation.add(chatModel);
       }
     }
@@ -92,8 +113,8 @@ class _ChatPageState extends State<ChatPage> {
           avatarImage:
               userModel.avatarImage == null ? "" : userModel.avatarImage!,
           isGroup: false,
-          timestamp: '03:00',
-          currentMessage: 'currentMessage');
+          timestamp: '',
+          currentMessage: '');
     });
   }
 
@@ -112,10 +133,8 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: chatmodels.isNotEmpty
           ? ListView.builder(
-              itemBuilder: (context, index) => CustomCard(
-                chatModel: chatmodels[index],
-                sourchat: sourceChat,
-              ),
+              itemBuilder: (context, index) =>
+                  CustomCard(chatModel: chatmodels[index]),
               itemCount: chatmodels.length,
             )
           : invite_friends(),

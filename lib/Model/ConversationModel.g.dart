@@ -10,6 +10,7 @@ ConversationModel _$ConversationModelFromJson(Map<String, dynamic> json) =>
     ConversationModel(
       id: json['_id'] as String,
       displayName: json['displayName'] as String,
+      avatarImage: json['avatarImage'] as String,
       unreadCount: json['unreadCount'] as int?,
       members: (json['members'] as List<dynamic>?)
           ?.map((e) => MemberModel.fromJson(e as Map<String, dynamic>))
@@ -20,6 +21,7 @@ Map<String, dynamic> _$ConversationModelToJson(ConversationModel instance) =>
     <String, dynamic>{
       '_id': instance.id,
       'displayName': instance.displayName,
+      'avatarImage': instance.avatarImage,
       'unreadCount': instance.unreadCount,
       'members': instance.members,
     };

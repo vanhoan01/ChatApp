@@ -1,15 +1,22 @@
 // ignore_for_file: file_names
 
+import 'dart:convert';
+
 import 'package:chatapp/CustomUI/AvtarCardItem.dart';
 import 'package:chatapp/Model/ChatModel.dart';
+import 'package:chatapp/Model/ChatterModel.dart';
+import 'package:chatapp/Model/ConversationModel.dart';
+import 'package:chatapp/Model/userModel.dart';
 import 'package:chatapp/Screens/Homescreen.dart';
+import 'package:chatapp/Screens/IndividualPage.dart';
 import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class NewGroup extends StatefulWidget {
   const NewGroup({Key? key, required this.groups}) : super(key: key);
-  final List<ChatModel> groups;
+  final List<ChatterModel> groups;
 
   @override
   State<NewGroup> createState() => _NewGroupState();
@@ -31,7 +38,7 @@ class _NewGroupState extends State<NewGroup> {
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: const [
             Text(
               'Nhóm mới',
               style: TextStyle(
@@ -50,7 +57,7 @@ class _NewGroupState extends State<NewGroup> {
       ),
       body: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Container(
@@ -61,7 +68,7 @@ class _NewGroupState extends State<NewGroup> {
               child: ListView(
                 children: <Widget>[
                   titleTextField(),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
@@ -78,7 +85,7 @@ class _NewGroupState extends State<NewGroup> {
               child: Text("Những người tham gia: ${widget.groups.length}"),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           SizedBox(
             height: 75,
             child: ListView.builder(
@@ -93,13 +100,7 @@ class _NewGroupState extends State<NewGroup> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (builder) => Homescreen(),
-              //IndividuaPage
-            ),
-          );
+          addConversation();
         },
         backgroundColor: const Color(0xFF128C7E),
         child: const Icon(Icons.check),
@@ -132,11 +133,11 @@ class _NewGroupState extends State<NewGroup> {
             child: InkWell(
               onTap: takeCoverPhoto,
               child: CircleAvatar(
+                backgroundColor: Colors.teal,
                 child: Icon(
                   iconphoto,
                   color: Colors.white,
                 ),
-                backgroundColor: Colors.teal,
               ),
             ),
           ),
@@ -147,49 +148,71 @@ class _NewGroupState extends State<NewGroup> {
     );
   }
 
-  Widget addButton() {
-    return InkWell(
-      onTap: () async {
-        if (_imageFile != null && _globalkey.currentState!.validate()) {
-          // AddBlogModel addBlogModel =
-          //     AddBlogModel(body: _body.text, title: _title.text);
-          // var response = await networkHandler.post1(
-          //     "/blogpost/Add", addBlogModel.toJson());
-          // print(response.body);
+  Future<void> addConversation() async {
+    String avatarImage = "";
+    if (_imageFile != null) {
+      //add Image
+      var request = http.MultipartRequest(
+          "POST", Uri.parse("${networkHandler.getURL()}/image/addimage"));
+      request.files
+          .add(await http.MultipartFile.fromPath("img", _imageFile.path));
+      request.headers.addAll({
+        "Content-type": "multipart/form-data",
+      });
+      http.StreamedResponse response = await request.send();
+      var httpResponse = await http.Response.fromStream(response);
+      var data = json.decode(httpResponse.body);
+      print("data: $data");
+      avatarImage = data['path'];
+      print("avatarImage: $avatarImage");
+    }
+    if (_globalkey.currentState!.validate()) {
+      print("avatarImage: $avatarImage");
+      var responseUser = await networkHandler.get("/user/getData");
+      UserModel userModel = UserModel.fromJson(responseUser);
+      var members = [
+        {"userName": userModel.username, "memberShipStatus": "Quản trị viên"}
+      ];
+      widget.groups.forEach((mem) => members.add({"userName": mem.userName}));
+      var conversationModel = {
+        "displayName": _title.text,
+        "avatarImage": avatarImage,
+        "members": members
+      };
+      var response =
+          await networkHandler.post1("/conversation/add", conversationModel);
+      //.toJson()
+      print(response.body);
 
-          // if (response.statusCode == 200 || response.statusCode == 201) {
-          //   String id = json.decode(response.body)["data"];
-          //   var imageResponse = await networkHandler.patchImage(
-          //       "/blogpost/add/coverImage/$id", _imageFile.path);
-          //   print(imageResponse.statusCode);
-          //   if (imageResponse.statusCode == 200 ||
-          //       imageResponse.statusCode == 201) {
-          //     Navigator.pushAndRemoveUntil(
-          //         context,
-          //         MaterialPageRoute(builder: (context) => HomePage()),
-          //         (route) => false);
-          //   }
-          // }
-        }
-      },
-      child: Center(
-        child: Container(
-          height: 50,
-          width: 200,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10), color: Colors.teal),
-          child: Center(
-              child: Text(
-            "Add Blog",
-            style: TextStyle(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-          )),
-        ),
-      ),
-    );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // var conver = json.decode(response.body)["data"];
+        ConversationModel conversationModel =
+            ConversationModel.fromJson(json.decode(response.body)['data']);
+        print(conversationModel);
+        ChatModel chatModel = ChatModel(
+            userName: conversationModel.id,
+            displayName: conversationModel.displayName,
+            avatarImage: conversationModel.avatarImage,
+            isGroup: true,
+            timestamp: '',
+            currentMessage: '');
+        print(
+            "chatModelAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: ${chatModel.avatarImage}");
+        print(
+            "conversationModel.avatarImageAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: ${conversationModel.avatarImage}");
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => IndividualPage(
+                      chatModel: chatModel,
+                    )),
+            (route) => false);
+      }
+    }
   }
 
   void takeCoverPhoto() async {
+    // ignore: deprecated_member_use
     final coverPhoto = await _picker.getImage(source: ImageSource.gallery);
     setState(() {
       _imageFile = coverPhoto!;

@@ -9,10 +9,12 @@ class ConversationModel {
   ConversationModel(
       {required this.id,
       required this.displayName,
+      required this.avatarImage,
       this.unreadCount,
       this.members});
   final String id;
   final String displayName;
+  final String avatarImage;
   final int? unreadCount;
   final List<MemberModel>? members;
 

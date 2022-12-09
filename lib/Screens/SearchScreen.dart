@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 class SearchScreen extends SearchDelegate {
   NetworkHandler networkHandler = NetworkHandler();
   // ListChatModel listChatModel = ListChatModel();
-  late ChatModel sourceChat;
   List<ChatModel> chatmodels = [
     // ChatModel(
     //     userName: 'hoan2',
@@ -103,16 +102,6 @@ class SearchScreen extends SearchDelegate {
     // chatModelChatterConversation
     //     .sort((a, b) => b.timestamp.compareTo(a.timestamp));
     chatmodels = chatModelChatterConversation;
-    var responseUser = await networkHandler.get("/user/getData");
-    UserModel userModel = UserModel.fromJson(responseUser);
-    sourceChat = ChatModel(
-        userName: userModel.username,
-        displayName: userModel.displayName,
-        avatarImage:
-            userModel.avatarImage == null ? "" : userModel.avatarImage!,
-        isGroup: false,
-        timestamp: '03:00',
-        currentMessage: 'currentMessage');
   }
 
   // first overwrite to
@@ -154,10 +143,7 @@ class SearchScreen extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         ChatModel chatModel = matchQuery[index];
-        return SearchItem(
-          chatModel: chatModel,
-          sourchat: sourceChat,
-        );
+        return SearchItem(chatModel: chatModel);
       },
     );
   }
@@ -177,10 +163,7 @@ class SearchScreen extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         ChatModel chatModel = matchQuery[index];
-        return SearchItem(
-          chatModel: chatModel,
-          sourchat: sourceChat,
-        );
+        return SearchItem(chatModel: chatModel);
       },
     );
     // return SearchResult(searchkey: query);

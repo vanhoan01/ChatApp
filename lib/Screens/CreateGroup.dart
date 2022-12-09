@@ -1,8 +1,12 @@
+// ignore_for_file: file_names
+
 import 'package:chatapp/CustomUI/AvtarCard.dart';
 import 'package:chatapp/CustomUI/ContactCard.dart';
-import 'package:chatapp/Model/ChatModel.dart';
+import 'package:chatapp/Model/ChatterModel.dart';
+import 'package:chatapp/Model/ListChatterModel.dart';
 import 'package:chatapp/Screens/NewGroup.dart';
 import 'package:chatapp/Screens/SearchScreen.dart';
+import 'package:chatapp/Services/metwork_handler.dart';
 import 'package:flutter/material.dart';
 
 class CreateGroup extends StatefulWidget {
@@ -13,14 +17,40 @@ class CreateGroup extends StatefulWidget {
 }
 
 class _CreateGroupState extends State<CreateGroup> {
-  List<ChatModel> contacts = [
-    ChatModel.ChatModelGroup(displayName: 'Dev Stack', status: 'full stack'),
-    ChatModel.ChatModelGroup(
-        displayName: 'Balram', status: 'Flutter developer'),
-    ChatModel.ChatModelGroup(displayName: 'Saket', status: 'Flutter developer'),
-    ChatModel.ChatModelGroup(displayName: 'Dev', status: 'Flutter developer'),
-  ];
-  List<ChatModel> groups = [];
+  NetworkHandler networkHandler = NetworkHandler();
+  List<ChatterModel> contacts = [];
+  List<ChatterModel> groups = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    var responseChatters = await networkHandler.get("/user/get/friends");
+    var listChatterModel = ListChatterModel.fromJson(responseChatters);
+    var listChatters = listChatterModel.data;
+
+    List<ChatterModel> listCM = [];
+    ChatterModel chatterModel;
+
+    for (var i = 0; i < listChatters!.length; i = i + 1) {
+      chatterModel = ChatterModel(
+          userName: listChatters.elementAt(i).userName,
+          displayName: listChatters.elementAt(i).displayName,
+          avatarImage: listChatters.elementAt(i).avatarImage.toString(),
+          precense: listChatters.elementAt(i).precense,
+          select: false);
+      listCM.add(chatterModel);
+    }
+    // ignore: avoid_print
+    print(listCM);
+    setState(() {
+      contacts = listCM;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +58,7 @@ class _CreateGroupState extends State<CreateGroup> {
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: const [
             Text(
               'Nhóm mới',
               style: TextStyle(
@@ -52,7 +82,7 @@ class _CreateGroupState extends State<CreateGroup> {
                 delegate: SearchScreen(),
               );
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.search,
               size: 26,
             ),
@@ -66,7 +96,7 @@ class _CreateGroupState extends State<CreateGroup> {
             itemBuilder: (context, index) {
               if (index == 0) {
                 return Container(
-                  height: groups.length > 0 ? 90 : 10,
+                  height: groups.isNotEmpty ? 90 : 10,
                 );
               }
               return InkWell(
@@ -87,7 +117,7 @@ class _CreateGroupState extends State<CreateGroup> {
               );
             },
           ),
-          groups.length > 0
+          groups.isNotEmpty
               ? Column(
                   children: [
                     Container(
@@ -113,7 +143,7 @@ class _CreateGroupState extends State<CreateGroup> {
                         },
                       ),
                     ),
-                    Divider(
+                    const Divider(
                       thickness: 1,
                     ),
                   ],

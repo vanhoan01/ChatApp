@@ -1,4 +1,5 @@
 import 'package:chatapp/Model/ChatModel.dart';
+import 'package:chatapp/Model/ChatterModel.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class ContactCard extends StatelessWidget {
   const ContactCard({Key? key, required this.contact}) : super(key: key);
-  final ChatModel contact;
+  final ChatterModel contact;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class ContactCard extends StatelessWidget {
               ),
               backgroundColor: Colors.blueGrey[200],
             ),
-            contact.select
+            contact.select!
                 ? Positioned(
                     bottom: 4,
                     right: 5,
@@ -52,7 +53,7 @@ class ContactCard extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        contact.status,
+        contact.precense!,
         style: TextStyle(
           fontSize: 13,
         ),

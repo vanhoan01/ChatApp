@@ -7,9 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class NetworkHandler {
-  // https://arcane-coast-17048.herokuapp.com
+  // https://chat-server-three.vercel.app
+  //http://10.0.0.27:5000
 
-  String baseurl = "http://192.168.1.11:5000";
+  String baseurl = "http://192.168.1.6:5000";
   var log = Logger();
   FlutterSecureStorage storage = FlutterSecureStorage();
 

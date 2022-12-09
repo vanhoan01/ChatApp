@@ -6,9 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomCard extends StatelessWidget {
   final ChatModel chatModel;
-  final ChatModel sourchat;
-  const CustomCard({Key? key, required this.chatModel, required this.sourchat})
-      : super(key: key);
+  const CustomCard({Key? key, required this.chatModel}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +18,7 @@ class CustomCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => IndividualPage(
-              chatModel: chatModel,
-              sourchat: sourchat,
-            ),
+            builder: (context) => IndividualPage(chatModel: chatModel),
           ),
         );
       },
@@ -59,7 +54,9 @@ class CustomCard extends StatelessWidget {
             ),
             subtitle: Row(
               children: [
-                Icon(Icons.done_all),
+                chatModel.currentMessage == ""
+                    ? Container()
+                    : Icon(Icons.done_all),
                 SizedBox(
                   width: 3,
                 ),
@@ -71,7 +68,7 @@ class CustomCard extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: Text(chatModel.timestamp),
+            trailing: Text(timeString()),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 20, left: 80),
@@ -82,5 +79,18 @@ class CustomCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String timeString() {
+    if (chatModel.timestamp == "") {
+      return "";
+    }
+    var now = new DateTime.now();
+    String current = now.toString().substring(0, 10);
+    String dateLast = chatModel.timestamp.substring(0, 10);
+    if (current == dateLast) {
+      return chatModel.timestamp.substring(13, 18);
+    }
+    return dateLast;
   }
 }

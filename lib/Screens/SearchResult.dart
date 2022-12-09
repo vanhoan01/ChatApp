@@ -12,7 +12,6 @@ class SearchResult extends StatefulWidget {
 
 class _SearchResultState extends State<SearchResult> {
   late List<ChatModel> chatmodels = [];
-  late ChatModel sourceChat;
   @override
   void initState() {
     super.initState();
@@ -34,13 +33,6 @@ class _SearchResultState extends State<SearchResult> {
     }
     setState(() {
       chatmodels = chatModelChatter;
-      sourceChat = ChatModel(
-          userName: 'hoan',
-          displayName: 'Văn Hoàn',
-          avatarImage: '',
-          isGroup: false,
-          timestamp: '03:00',
-          currentMessage: 'currentMessage');
     });
   }
 
@@ -48,10 +40,8 @@ class _SearchResultState extends State<SearchResult> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView.builder(
-        itemBuilder: (context, index) => SearchItem(
-          chatModel: chatmodels[index],
-          sourchat: sourceChat,
-        ),
+        itemBuilder: (context, index) =>
+            SearchItem(chatModel: chatmodels[index]),
         itemCount: chatmodels.length,
       ),
     );

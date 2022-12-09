@@ -7,7 +7,7 @@ part of 'ChatterModel.dart';
 // **************************************************************************
 
 ChatterModel _$ChatterModelFromJson(Map<String, dynamic> json) => ChatterModel(
-      partition: json['partition'] as String,
+      partition: json['partition'] as String?,
       userName: json['userName'] as String,
       displayName: json['displayName'] as String,
       avatarImage: json['avatarImage'] as String?,

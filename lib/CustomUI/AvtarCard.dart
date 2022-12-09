@@ -1,4 +1,5 @@
 import 'package:chatapp/Model/ChatModel.dart';
+import 'package:chatapp/Model/ChatterModel.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -7,7 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class AvtarCard extends StatelessWidget {
   const AvtarCard({Key? key, required this.contact}) : super(key: key);
-  final ChatModel contact;
+  final ChatterModel contact;
 
   @override
   Widget build(BuildContext context) {

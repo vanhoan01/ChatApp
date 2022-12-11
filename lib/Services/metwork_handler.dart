@@ -10,7 +10,7 @@ class NetworkHandler {
   // https://chat-server-three.vercel.app
   //http://10.0.0.27:5000
 
-  String baseurl = "http://192.168.1.6:5000";
+  String baseurl = "http://192.168.72.157:5000";
   var log = Logger();
   FlutterSecureStorage storage = FlutterSecureStorage();
 

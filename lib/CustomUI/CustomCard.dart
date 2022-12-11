@@ -89,7 +89,7 @@ class CustomCard extends StatelessWidget {
     String current = now.toString().substring(0, 10);
     String dateLast = chatModel.timestamp.substring(0, 10);
     if (current == dateLast) {
-      return chatModel.timestamp.substring(13, 18);
+      return chatModel.timestamp.substring(14, 19);
     }
     return dateLast;
   }

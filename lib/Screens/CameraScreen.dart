@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:math';
 
 import 'package:camera/camera.dart';
@@ -24,11 +26,12 @@ class _CameraScreenState extends State<CameraScreen> {
   double transform = 0;
   String videoPath = "";
   XFile? videoFile;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _cameraController = CameraController(cameras[0], ResolutionPreset.high);
+    _cameraController = CameraController(cameras.first, ResolutionPreset.high);
     cameraValue = _cameraController.initialize().then((_) {
       if (!mounted) {
         return;
@@ -38,9 +41,11 @@ class _CameraScreenState extends State<CameraScreen> {
       if (e is CameraException) {
         switch (e.code) {
           case 'CameraAccessDenied':
+            // ignore: avoid_print
             print('User denied camera access.');
             break;
           default:
+            // ignore: avoid_print
             print('Handle other errors.');
             break;
         }
@@ -50,9 +55,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _cameraController.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,13 +68,13 @@ class _CameraScreenState extends State<CameraScreen> {
             future: cameraValue,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                return Container(
+                return SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   child: CameraPreview(_cameraController),
                 );
               } else {
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
@@ -80,7 +84,7 @@ class _CameraScreenState extends State<CameraScreen> {
             bottom: 0.0,
             child: Container(
               color: Colors.black,
-              padding: EdgeInsets.only(top: 5, bottom: 5),
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
@@ -119,6 +123,7 @@ class _CameraScreenState extends State<CameraScreen> {
                             isRecording = false;
                           });
                           // onStopButtonPressed(context);
+                          // ignore: use_build_context_synchronously
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -133,12 +138,12 @@ class _CameraScreenState extends State<CameraScreen> {
                           }
                         },
                         child: isRecording
-                            ? Icon(
+                            ? const Icon(
                                 Icons.radio_button_on,
                                 color: Colors.red,
                                 size: 80,
                               )
-                            : Icon(
+                            : const Icon(
                                 Icons.panorama_fish_eye,
                                 color: Colors.white,
                                 size: 70,
@@ -157,7 +162,7 @@ class _CameraScreenState extends State<CameraScreen> {
                         },
                         icon: Transform.rotate(
                           angle: transform,
-                          child: Icon(
+                          child: const Icon(
                             Icons.flip_camera_android,
                             color: Colors.white,
                             size: 28,
@@ -166,10 +171,8 @@ class _CameraScreenState extends State<CameraScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Text(
+                  const SizedBox(height: 4),
+                  const Text(
                     "Hold for video, tap for photo",
                     style: TextStyle(color: Colors.white),
                     textAlign: TextAlign.center,
@@ -185,6 +188,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   void takePhoto(BuildContext context) async {
     XFile picture = await _cameraController.takePicture();
+    // ignore: use_build_context_synchronously
     Navigator.push(
       context,
       MaterialPageRoute(

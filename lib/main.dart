@@ -67,5 +67,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+//flutter pub run build_runner build
 // chinh ip metwwork_handler.dart
 // flutter run lib/main.dart

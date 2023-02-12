@@ -10,7 +10,9 @@ class NetworkHandler {
   // https://chat-server-three.vercel.app
   //http://10.0.0.27:5000
 
-  String baseurl = "http://192.168.72.157:5000";
+  String baseurl = "http://172.15.25.64:5000";
+  String urlimage =
+      "https://raw.githubusercontent.com/vanhoan01/ChatServer/0b8479df2afee1b507bf75d1baf716c8e967c9b3";
   var log = Logger();
   FlutterSecureStorage storage = FlutterSecureStorage();
 
@@ -134,5 +136,9 @@ class NetworkHandler {
 
   String getURL() {
     return baseurl;
+  }
+
+  String getURLImage() {
+    return urlimage;
   }
 }

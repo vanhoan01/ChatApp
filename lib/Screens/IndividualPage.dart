@@ -19,6 +19,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class IndividualPage extends StatefulWidget {
   const IndividualPage({Key? key, required this.chatModel}) : super(key: key);
@@ -46,6 +47,8 @@ class _IndividualPageState extends State<IndividualPage> {
   late String _url = "";
   ListChatMessagesModel listChatMessagesModel = ListChatMessagesModel();
 
+  var uuid = Uuid();
+
   _onEmojiSelected(Emoji emoji) {
     _textEditingController
       ..text += emoji.emoji
@@ -66,6 +69,7 @@ class _IndividualPageState extends State<IndividualPage> {
 
     super.initState();
     _url = networkHandler.getURL();
+    // _urlImage = networkHandler.getURLImage();
     connect();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -224,46 +228,45 @@ class _IndividualPageState extends State<IndividualPage> {
                             return OwnFileCard(
                               path: messages[index].image,
                               message: messages[index].text,
-                              time: messages[index]
-                                  .timestamp
-                                  .toString()
-                                  .substring(10, 16),
+                              time: messages[index].timestamp,
+                              timeAfter: index < messages.length - 1
+                                  ? messages[index + 1].timestamp
+                                  : DateTime.parse('2010-01-01'),
+                              // .substring(10, 16),
                             );
                           } else {
                             return OwnMessageCard(
                               message: messages[index].text,
-                              time: messages[index]
-                                  .timestamp
-                                  .toString()
-                                  .substring(10, 16),
+                              time: messages[index].timestamp,
+                              timeAfter: index < messages.length - 1
+                                  ? messages[index + 1].timestamp
+                                  : DateTime.parse('2010-01-01'),
                             );
                           }
                         } else {
                           if (messages[index].image.isNotEmpty) {
                             return ReplyFileCard(
                               avartar: widget.chatModel.isGroup
-                                  ? getAvartar(messages[index].author)
-                                      .toString()
-                                  : widget.chatModel.avatarImage,
+                                  ? messages[index].author
+                                  : widget.chatModel.userName,
                               path: messages[index].image,
                               message: messages[index].text,
-                              time: messages[index]
-                                  .timestamp
-                                  .toString()
-                                  .substring(10, 16),
+                              time: messages[index].timestamp,
+                              timeAfter: index < messages.length - 1
+                                  ? messages[index + 1].timestamp
+                                  : DateTime.parse('2010-01-01'),
                               isGroup: widget.chatModel.isGroup,
                             );
                           } else {
                             return ReplyCard(
-                              path: widget.chatModel.isGroup
-                                  ? getAvartar(messages[index].author)
-                                      .toString()
-                                  : widget.chatModel.avatarImage,
+                              avartar: widget.chatModel.isGroup
+                                  ? messages[index].author
+                                  : widget.chatModel.userName,
                               message: messages[index].text,
-                              time: messages[index]
-                                  .timestamp
-                                  .toString()
-                                  .substring(10, 16),
+                              time: messages[index].timestamp,
+                              timeAfter: index < messages.length - 1
+                                  ? messages[index + 1].timestamp
+                                  : DateTime.parse('2010-01-01'),
                               isGroup: widget.chatModel.isGroup,
                             );
                           }
@@ -421,8 +424,10 @@ class _IndividualPageState extends State<IndividualPage> {
     var responseAvartar = await networkHandler.get("/user/get/image/$userName");
     // ignore: unnecessary_null_comparison
     if (responseAvartar.toString() == null) {
+      print('null');
       return "";
     }
+    print(responseAvartar.toString());
     return responseAvartar.toString();
   }
 
@@ -470,13 +475,19 @@ class _IndividualPageState extends State<IndividualPage> {
       "transports": ["websocket"],
       "autoConnect": false,
     });
+    // ignore: await_only_futures
     await socket.connect();
     socket.emit("signin", sourceChat!.userName);
     socket.onConnect((data) {
+      // ignore: avoid_print
       print("Connected");
       socket.on("message", (msg) {
+        // ignore: avoid_print
         print(msg);
+        // if(msg['userId'] != widget.userId){}
         setMessage(
+          msg["author"],
+          msg["partition"],
           msg["message"],
           msg["path"],
         );
@@ -498,10 +509,11 @@ class _IndividualPageState extends State<IndividualPage> {
       "image": image
     };
     var responseSend = await networkHandler.post("/chatmessage/add", data);
+    // ignore: avoid_print
     print(responseSend);
 
     //socket
-    setMessage(text, image);
+    setMessage(sourceChat!.userName, widget.chatModel.userName, text, image);
     socket.emit("message", {
       "message": text,
       "sourceId": sourceChat!.userName,
@@ -511,6 +523,7 @@ class _IndividualPageState extends State<IndividualPage> {
   }
 
   void onImageSend(String path, String message) async {
+    // ignore: avoid_print
     print("Hey there working $message");
     for (var i = 0; i < popTime; i++) {
       Navigator.pop(context);
@@ -521,7 +534,7 @@ class _IndividualPageState extends State<IndividualPage> {
 
     //add Image
     var request =
-        http.MultipartRequest("POST", Uri.parse("${_url}/image/addimage"));
+        http.MultipartRequest("POST", Uri.parse("$_url/image/addimage"));
     request.files.add(await http.MultipartFile.fromPath("img", path));
     request.headers.addAll({
       "Content-type": "multipart/form-data",
@@ -543,7 +556,8 @@ class _IndividualPageState extends State<IndividualPage> {
     print(responseSend);
 
     //send Socket
-    setMessage(message, path);
+    setMessage(sourceChat!.userName, widget.chatModel.userName, message, path);
+    // setMessage(message, data['path']);
     socket.emit("message", {
       "message": message,
       "sourceId": sourceChat!.userName,
@@ -552,14 +566,14 @@ class _IndividualPageState extends State<IndividualPage> {
     });
   }
 
-  void setMessage(String text, String image) {
+  void setMessage(String author, String partition, String text, String image) {
     ChatMessagesModel messageModel = ChatMessagesModel(
-      author: sourceChat!.userName,
-      partition: widget.chatModel.userName,
+      author: author,
+      partition: partition,
       text: text,
       image: image,
       timestamp: DateTime.now(),
-      // DateTime.now().toString().substring(10, 16),
+      // DateTime.now().toString().substring(11, 16),
     );
     setState(() {
       messages.insert(0, messageModel);

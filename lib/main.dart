@@ -1,8 +1,8 @@
 import 'package:camera/camera.dart';
-import 'package:chatapp/Pages/LoadingPage.dart';
-import 'package:chatapp/Screens/CameraScreen.dart';
-import 'package:chatapp/Screens/Homescreen.dart';
-import 'package:chatapp/Screens/LoginScreen.dart';
+import 'package:chatapp/View/Pages/LoadingPage.dart';
+import 'package:chatapp/View/Screens/CameraScreen.dart';
+import 'package:chatapp/View/Screens/Homescreen.dart';
+import 'package:chatapp/View/Screens/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -67,6 +67,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-//flutter pub run build_runner build
+// flutter pub run build_runner build
 // chinh ip metwwork_handler.dart
 // flutter run lib/main.dart

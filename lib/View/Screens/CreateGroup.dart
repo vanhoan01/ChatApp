@@ -1,9 +1,9 @@
 // ignore_for_file: file_names
 
+import 'package:chatapp/Model/List/ListChatterModel.dart';
+import 'package:chatapp/Model/Model/ChatterModel.dart';
 import 'package:chatapp/View/CustomUI/AvtarCard.dart';
 import 'package:chatapp/View/CustomUI/ContactCard.dart';
-import 'package:chatapp/Model/ChatterModel.dart';
-import 'package:chatapp/Model/ListChatterModel.dart';
 import 'package:chatapp/View/Screens/NewGroup.dart';
 import 'package:chatapp/View/Screens/SearchScreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';

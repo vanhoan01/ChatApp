@@ -8,6 +8,7 @@ import 'package:chatapp/View/Pages/StatusPage.dart';
 import 'package:chatapp/View/Screens/CreateGroup.dart';
 import 'package:chatapp/View/Screens/LoginScreen.dart';
 import 'package:chatapp/View/Screens/SearchScreen.dart';
+import 'package:chatapp/View/Screens/UploadImage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -67,6 +68,12 @@ class _HomescreenState extends State<Homescreen>
                     MaterialPageRoute(
                         builder: (builder) => const MenuScreen()));
               }
+              if (value == "uploadimage") {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => const UploadImage()));
+              }
               // ignore: avoid_print
               print(value);
             },
@@ -87,6 +94,10 @@ class _HomescreenState extends State<Homescreen>
                 const PopupMenuItem(
                   value: 'dangxuat',
                   child: Text('Đăng xuất'),
+                ),
+                const PopupMenuItem(
+                  value: 'uploadimage',
+                  child: Text('Upload image'),
                 ),
               ];
             },

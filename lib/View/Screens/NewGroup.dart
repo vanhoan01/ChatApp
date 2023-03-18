@@ -2,12 +2,11 @@
 
 import 'dart:convert';
 
+import 'package:chatapp/Model/Model/ChatModel.dart';
+import 'package:chatapp/Model/Model/ChatterModel.dart';
+import 'package:chatapp/Model/Model/ConversationModel.dart';
+import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/View/CustomUI/AvtarCardItem.dart';
-import 'package:chatapp/Model/ChatModel.dart';
-import 'package:chatapp/Model/ChatterModel.dart';
-import 'package:chatapp/Model/ConversationModel.dart';
-import 'package:chatapp/Model/userModel.dart';
-import 'package:chatapp/View/Screens/Homescreen.dart';
 import 'package:chatapp/View/Screens/IndividualPage.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +23,9 @@ class NewGroup extends StatefulWidget {
 
 class _NewGroupState extends State<NewGroup> {
   final _globalkey = GlobalKey<FormState>();
-  TextEditingController _title = TextEditingController();
-  TextEditingController _body = TextEditingController();
-  ImagePicker _picker = ImagePicker();
+  final TextEditingController _title = TextEditingController();
+  final TextEditingController _body = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   late PickedFile _imageFile;
   IconData iconphoto = Icons.camera_alt;
   NetworkHandler networkHandler = NetworkHandler();
@@ -171,9 +170,11 @@ class _NewGroupState extends State<NewGroup> {
       var responseUser = await networkHandler.get("/user/getData");
       UserModel userModel = UserModel.fromJson(responseUser);
       var members = [
-        {"userName": userModel.username, "memberShipStatus": "Quản trị viên"}
+        {"userName": userModel.userName, "memberShipStatus": "Quản trị viên"}
       ];
-      widget.groups.forEach((mem) => members.add({"userName": mem.userName}));
+      for (var mem in widget.groups) {
+        members.add({"userName": mem.userName});
+      }
       var conversationModel = {
         "displayName": _title.text,
         "avatarImage": avatarImage,
@@ -196,10 +197,8 @@ class _NewGroupState extends State<NewGroup> {
             isGroup: true,
             timestamp: '',
             currentMessage: '');
-        print(
-            "chatModelAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: ${chatModel.avatarImage}");
-        print(
-            "conversationModel.avatarImageAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: ${conversationModel.avatarImage}");
+
+        // ignore: use_build_context_synchronously
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(

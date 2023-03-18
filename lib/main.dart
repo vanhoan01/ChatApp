@@ -3,12 +3,14 @@ import 'package:chatapp/View/Pages/LoadingPage.dart';
 import 'package:chatapp/View/Screens/CameraScreen.dart';
 import 'package:chatapp/View/Screens/Homescreen.dart';
 import 'package:chatapp/View/Screens/LoginScreen.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
+  // await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -32,7 +34,7 @@ class _MyAppState extends State<MyApp> {
     String? token = await storage.read(key: "token");
     if (token != null) {
       setState(() {
-        page = Homescreen();
+        page = const Homescreen();
       });
     } else {
       setState(() {

@@ -1,4 +1,6 @@
-import 'package:chatapp/Model/ChatMessagesModel.dart';
+// ignore_for_file: file_names
+
+import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ListChatMessagesModel.g.dart';

@@ -1,4 +1,6 @@
-import 'package:chatapp/Model/CountryModel.dart';
+// ignore_for_file: file_names
+
+import 'package:chatapp/Model/Model/CountryModel.dart';
 import 'package:flutter/material.dart';
 
 class CountryPage extends StatefulWidget {
@@ -37,12 +39,12 @@ class _CountryPageState extends State<CountryPage> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back,
             color: Colors.teal,
           ),
         ),
-        title: Text(
+        title: const Text(
           "Choose a country",
           style: TextStyle(
             color: Colors.teal,
@@ -54,7 +56,7 @@ class _CountryPageState extends State<CountryPage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.search,
               color: Colors.teal,
             ),
@@ -74,19 +76,17 @@ class _CountryPageState extends State<CountryPage> {
         widget.setCountryData(country);
       },
       child: Card(
-        margin: EdgeInsets.all(0.15),
+        margin: const EdgeInsets.all(0.15),
         child: Container(
           height: 60,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
           child: Row(
             children: [
               Text(country.flag),
-              SizedBox(
-                width: 15,
-              ),
+              const SizedBox(width: 15),
               Text(country.name),
               Expanded(
-                child: Container(
+                child: SizedBox(
                   width: 150,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,

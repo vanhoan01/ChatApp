@@ -1,6 +1,9 @@
 // ignore_for_file: file_names
 
+import 'package:chatapp/Model/Model/userModel.dart';
+import 'package:chatapp/Resources/app_urls.dart';
 import 'package:chatapp/View/Profile/ProfilePage.dart';
+import 'package:chatapp/ViewModel/Profile/UserViewModel.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -11,9 +14,32 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  UserViewModel userViewModel = UserViewModel();
+  UserModel? userModel;
+
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
+
+  void getUser() async {
+    UserModel data = await userViewModel.getFriendStatus();
+    setState(() {
+      userModel = data;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text("Tùy chọn"),
+      ),
       body: ListView(children: [
         UserItem(),
         OptionItem(Icons.account_tree_outlined, Colors.purple,
@@ -35,19 +61,24 @@ class _MenuScreenState extends State<MenuScreen> {
   // ignore: non_constant_identifier_names
   Widget UserItem() {
     return InkWell(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (builder) => const ProfilePage())),
-      child: const Padding(
-        padding: EdgeInsets.symmetric(vertical: 20),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (builder) => const ProfilePage(),
+        ),
+      ).then((value) => getUser()),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: ListTile(
           leading: CircleAvatar(
             radius: 24,
             backgroundColor: Colors.white,
-            backgroundImage: AssetImage("assets/balram.jpg"),
+            backgroundImage: NetworkImage(
+                "${AppUrl.imageUrl}${userModel == null ? "" : userModel!.avatarImage}"),
           ),
           title: Text(
-            "Nguyễn Văn Hoàn",
-            style: TextStyle(
+            userModel == null ? "" : userModel!.displayName,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),

@@ -1,4 +1,6 @@
-import 'package:chatapp/Model/CountryModel.dart';
+// ignore_for_file: file_names
+
+import 'package:chatapp/Model/Model/CountryModel.dart';
 import 'package:chatapp/View/NewScreen/CountryPage.dart';
 import 'package:chatapp/View/NewScreen/OtpScreen.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +15,14 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String countryname = "VietNam";
   String countrycode = "+84";
-  TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _textEditingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
+        title: const Text(
           "Nhập số điện thoại của bạn",
           style: TextStyle(
             color: Colors.teal,
@@ -30,27 +32,25 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         centerTitle: true,
-        actions: [
+        actions: const [
           Icon(
             Icons.more_vert,
             color: Colors.black,
           ),
         ],
       ),
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
-            Text(
+            const Text(
               "Whatsapp sẽ gửi tin nhắn sms để xác minh số của bạn",
               style: TextStyle(
                 fontSize: 13.5,
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 5),
             Text(
               "Số của bạn là gì?",
               style: TextStyle(
@@ -58,13 +58,9 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.cyan[800],
               ),
             ),
-            SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
             countryCard(),
-            SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
             number(),
             Expanded(child: Container()),
             InkWell(
@@ -79,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.tealAccent[400],
                 height: 40,
                 width: 70,
-                child: Center(
+                child: const Center(
                   child: Text(
                     "TIẾP",
                     style: TextStyle(fontWeight: FontWeight.w600),
@@ -87,9 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 40,
-            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -107,8 +101,8 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Container(
         width: MediaQuery.of(context).size.width / 1.5,
-        padding: EdgeInsets.symmetric(vertical: 5),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               color: Colors.teal,
@@ -119,18 +113,16 @@ class _LoginPageState extends State<LoginPage> {
         child: Row(
           children: [
             Expanded(
-              child: Container(
-                child: Center(
-                  child: Text(
-                    countryname,
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
+              child: Center(
+                child: Text(
+                  countryname,
+                  style: const TextStyle(
+                    fontSize: 16,
                   ),
                 ),
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_drop_down,
               color: Colors.teal,
               size: 28,
@@ -145,12 +137,12 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: MediaQuery.of(context).size.width / 1.5,
       height: 38,
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
           Container(
             width: 70,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: Colors.teal,
@@ -160,28 +152,22 @@ class _LoginPageState extends State<LoginPage> {
             ),
             child: Row(
               children: [
-                SizedBox(
-                  width: 10,
-                ),
-                Text(
+                const SizedBox(width: 10),
+                const Text(
                   "+",
                   style: TextStyle(fontSize: 18),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
+                const SizedBox(width: 15),
                 Text(
                   countrycode.substring(1),
-                  style: TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 15),
                 ),
               ],
             ),
           ),
-          SizedBox(
-            width: 30,
-          ),
+          const SizedBox(width: 30),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: Colors.teal,
@@ -193,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
             child: TextFormField(
               controller: _textEditingController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(11.5),
                 //8
@@ -224,24 +210,20 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Chúng tôi sẽ xác minh số điện thoại của bạn",
                   style: TextStyle(fontSize: 14),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Text(
-                  countrycode + " " + _textEditingController.text,
-                  style: TextStyle(
+                  "$countrycode ${_textEditingController.text}",
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   "Điều này có ổn không, hoặc bạn muốn chỉnh sửa số?",
                   style: TextStyle(fontSize: 13.5),
                 ),
@@ -253,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Edit"),
+              child: const Text("Edit"),
             ),
             TextButton(
               onPressed: () {
@@ -266,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                               number: _textEditingController.text,
                             )));
               },
-              child: Text("Ok"),
+              child: const Text("Ok"),
             ),
           ],
         );
@@ -283,7 +265,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 Text(
                   "Không có số bạn nhập",
                   style: TextStyle(fontSize: 14),
@@ -296,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Ok"),
+              child: const Text("Ok"),
             ),
           ],
         );

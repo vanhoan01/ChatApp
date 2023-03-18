@@ -1,4 +1,6 @@
-import 'package:chatapp/Model/ChatModel.dart';
+// ignore_for_file: file_names
+
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/View/Screens/IndividualPage.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +49,7 @@ class CustomCard extends StatelessWidget {
             ),
             title: Text(
               chatModel.displayName,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -57,12 +59,12 @@ class CustomCard extends StatelessWidget {
                 chatModel.currentMessage == ""
                     ? Container()
                     : Icon(Icons.done_all),
-                SizedBox(
+                const SizedBox(
                   width: 3,
                 ),
                 Text(
                   chatModel.currentMessage,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                   ),
                 ),
@@ -70,8 +72,8 @@ class CustomCard extends StatelessWidget {
             ),
             trailing: Text(timeString()),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 20, left: 80),
+          const Padding(
+            padding: EdgeInsets.only(right: 20, left: 80),
             child: Divider(
               thickness: 1,
             ),
@@ -85,7 +87,7 @@ class CustomCard extends StatelessWidget {
     if (chatModel.timestamp == "") {
       return "";
     }
-    var now = new DateTime.now();
+    var now = DateTime.now();
     String current = now.toString().substring(0, 10);
     String dateLast = chatModel.timestamp.substring(0, 10);
     if (current == dateLast) {

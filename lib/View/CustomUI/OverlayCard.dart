@@ -13,7 +13,7 @@ class OverlayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 200,
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
       width: MediaQuery.of(context).size.width,
       child: Stack(
         children: <Widget>[
@@ -31,14 +31,14 @@ class OverlayCard extends StatelessWidget {
           Positioned(
             bottom: 2,
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               height: 55,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(8)),
               child: Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                 ),

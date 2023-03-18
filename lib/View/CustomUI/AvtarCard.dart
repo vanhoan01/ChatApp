@@ -1,8 +1,6 @@
-import 'package:chatapp/Model/ChatModel.dart';
-import 'package:chatapp/Model/ChatterModel.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+// ignore_for_file: file_names
 
+import 'package:chatapp/Model/Model/ChatterModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,15 +19,15 @@ class AvtarCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 23,
+                backgroundColor: Colors.blueGrey[200],
                 child: SvgPicture.asset(
                   'assets/person.svg',
                   color: Colors.white,
                   height: 30,
                   width: 30,
                 ),
-                backgroundColor: Colors.blueGrey[200],
               ),
-              Positioned(
+              const Positioned(
                 bottom: 0,
                 right: 0,
                 child: CircleAvatar(
@@ -44,12 +42,12 @@ class AvtarCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 2,
           ),
           Text(
             contact.displayName,
-            style: TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 12),
           ),
         ],
       ),

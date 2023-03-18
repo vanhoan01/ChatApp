@@ -7,6 +7,7 @@ part of 'ChatModel.dart';
 // **************************************************************************
 
 ChatModel _$ChatModelFromJson(Map<String, dynamic> json) => ChatModel(
+      id: json['_id'] as String?,
       userName: json['userName'] as String,
       displayName: json['displayName'] as String,
       avatarImage: json['avatarImage'] as String,
@@ -18,6 +19,7 @@ ChatModel _$ChatModelFromJson(Map<String, dynamic> json) => ChatModel(
       ..select = json['select'] as bool;
 
 Map<String, dynamic> _$ChatModelToJson(ChatModel instance) => <String, dynamic>{
+      '_id': instance.id,
       'userName': instance.userName,
       'displayName': instance.displayName,
       'avatarImage': instance.avatarImage,

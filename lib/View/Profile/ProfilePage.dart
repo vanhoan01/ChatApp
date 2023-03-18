@@ -1,15 +1,34 @@
 // ignore_for_file: file_names
 
+import 'package:chatapp/Model/Model/userModel.dart';
+import 'package:chatapp/Resources/app_urls.dart';
+import 'package:chatapp/View/Profile/Screens/ProfileEdit.dart';
+import 'package:chatapp/ViewModel/Profile/UserViewModel.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
-
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  UserViewModel userViewModel = UserViewModel();
+  UserModel? userModel;
+
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
+
+  void getUser() async {
+    UserModel data = await userViewModel.getFriendStatus();
+    setState(() {
+      userModel = data;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 30),
             Stack(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundImage: NetworkImage(
-                      "https://topplus.vn/Userfiles/Upload/images/Download/2016/10/17/068bdc9e57db40a0ab112c56bda5f44d.jpg"),
+                      "${AppUrl.imageUrl}${userModel != null ? userModel!.avatarImage : ""}"),
                   radius: 55,
                 ),
                 Positioned(
@@ -52,25 +71,34 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Nguyễn Văn Hoàn",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              userModel != null ? userModel!.displayName : "",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Tiểu sử",
-              style: TextStyle(fontSize: 20),
+            Text(
+              userModel != null ? userModel!.biography ?? "" : "",
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 15),
             OptionItem(Icons.people_outlined, "500 người bạn"),
-            OptionItem(Icons.link, "van.hoan.ihs"),
+            OptionItem(
+                Icons.link, userModel != null ? userModel!.link ?? "" : ""),
+            const SizedBox(height: 15),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(width: 15),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileEdit(),
+                        ),
+                      ).then((value) => getUser());
+                    },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(
                           width: 1, color: Color.fromRGBO(224, 224, 224, 1)),
@@ -120,6 +148,10 @@ class _ProfilePageState extends State<ProfilePage> {
         title,
         style: const TextStyle(color: Colors.black),
       ),
+      horizontalTitleGap: 0,
+      // dense: true,
+      // contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: -10),
+      visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
     );
   }
 }

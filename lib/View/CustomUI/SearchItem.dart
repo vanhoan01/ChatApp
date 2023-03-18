@@ -1,4 +1,6 @@
-import 'package:chatapp/Model/ChatModel.dart';
+// ignore_for_file: file_names
+
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/View/Screens/IndividualPage.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';

@@ -1,6 +1,6 @@
 // ignore_for_file: file_names
 
-import 'package:chatapp/Model/ChatterModel.dart';
+import 'package:chatapp/Model/Model/ChatterModel.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ListChatterModel.g.dart';

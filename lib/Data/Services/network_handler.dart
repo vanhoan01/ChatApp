@@ -15,7 +15,7 @@ class NetworkHandler {
   String urlimage =
       "https://raw.githubusercontent.com/vanhoan01/ChatServer/0b8479df2afee1b507bf75d1baf716c8e967c9b3";
   var log = Logger();
-  FlutterSecureStorage storage = FlutterSecureStorage();
+  FlutterSecureStorage storage = const FlutterSecureStorage();
 
   Future get(String url) async {
     String? token = await storage.read(key: "token");
@@ -56,7 +56,7 @@ class NetworkHandler {
   Future<http.Response> post(String url, Map<String, String> body) async {
     String? token = await storage.read(key: "token");
     url = formater(url);
-    log.d(body);
+    // log.d(body);
     var response = await http.post(
       Uri.parse(url),
       headers: {

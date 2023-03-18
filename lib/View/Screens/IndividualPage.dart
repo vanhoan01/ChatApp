@@ -1,26 +1,26 @@
 // ignore_for_file: file_names
 
 import 'dart:convert';
-import 'package:chatapp/View/CustomUI/OwnFileCard.dart';
-import 'package:chatapp/View/CustomUI/OwnMessageCard.dart';
-import 'package:chatapp/View/CustomUI/ReplyCard.dart';
-import 'package:chatapp/View/CustomUI/ReplyFileCard.dart';
-import 'package:chatapp/Model/ChatMessagesModel.dart';
-import 'package:chatapp/Model/ChatModel.dart';
-import 'package:chatapp/Model/ListChatMessagesModel.dart';
-import 'package:chatapp/Model/userModel.dart';
+import 'dart:io';
+import 'package:chatapp/Model/List/ListChatMessagesModel.dart';
+import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
+import 'package:chatapp/Model/Model/ChatModel.dart';
+import 'package:chatapp/Model/Model/userModel.dart';
+import 'package:chatapp/View/ChatMessages/OwnMessageCard.dart';
+import 'package:chatapp/View/ChatMessages/ReplyMessengerCard.dart';
 import 'package:chatapp/View/Screens/CameraScreen.dart';
 import 'package:chatapp/View/Screens/CameraViewPage.dart';
 import 'package:chatapp/View/Screens/Homescreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:chatapp/View/InformationUser/InformationUser.dart';
+import 'package:chatapp/ViewModel/File/FileViewModel.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
-import 'package:uuid/uuid.dart';
 
 class IndividualPage extends StatefulWidget {
   const IndividualPage({Key? key, required this.chatModel}) : super(key: key);
@@ -33,7 +33,7 @@ class IndividualPage extends StatefulWidget {
 class _IndividualPageState extends State<IndividualPage> {
   bool show = false;
   FocusNode focusNode = FocusNode();
-  ChatModel? sourceChat;
+  UserModel? sourceChat;
   late IO.Socket socket;
   final TextEditingController _textEditingController = TextEditingController();
   bool sendButton = false;
@@ -48,7 +48,19 @@ class _IndividualPageState extends State<IndividualPage> {
   late String _url = "";
   ListChatMessagesModel listChatMessagesModel = ListChatMessagesModel();
 
-  var uuid = Uuid();
+  Map<String, String>? reply;
+  FilePickerResult? result;
+  List<File>? files;
+
+  void setReply(String id, String userReply, String textReply) {
+    setState(() {
+      reply = {
+        'id': id,
+        'userReply': userReply,
+        'textReply': textReply,
+      };
+    });
+  }
 
   _onEmojiSelected(Emoji emoji) {
     _textEditingController
@@ -100,7 +112,7 @@ class _IndividualPageState extends State<IndividualPage> {
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => Homescreen()),
+                    MaterialPageRoute(builder: (context) => const Homescreen()),
                     (route) => false);
               },
               child: Row(
@@ -184,7 +196,6 @@ class _IndividualPageState extends State<IndividualPage> {
                       ? Container()
                       : ketBan(),
                   Expanded(
-                    // height: MediaQuery.of(context).size.height - 140,
                     child: ListView.builder(
                       shrinkWrap: true,
                       reverse: true,
@@ -197,181 +208,219 @@ class _IndividualPageState extends State<IndividualPage> {
                           );
                         }
                         if (messages[index].author == sourceChat!.userName) {
-                          if (messages[index].image.isNotEmpty) {
-                            return OwnFileCard(
-                              path: messages[index].image,
-                              message: messages[index].text,
-                              time: messages[index].timestamp,
-                              timeAfter: index < messages.length - 1
-                                  ? messages[index + 1].timestamp
-                                  : DateTime.parse('2010-01-01'),
-                              // .substring(10, 16),
-                            );
-                          } else {
-                            return OwnMessageCard(
-                              message: messages[index].text,
-                              time: messages[index].timestamp,
-                              timeAfter: index < messages.length - 1
-                                  ? messages[index + 1].timestamp
-                                  : DateTime.parse('2010-01-01'),
-                            );
-                          }
+                          return OwnMessageCard(
+                            chatMM: messages[index],
+                            timeAfter: index < messages.length - 1
+                                ? messages[index + 1].timestamp
+                                : DateTime.parse('2010-01-01'),
+                            userId:
+                                sourceChat != null ? sourceChat!.id ?? "" : "",
+                            setReply: setReply,
+                          );
                         } else {
-                          if (messages[index].image.isNotEmpty) {
-                            return ReplyFileCard(
-                              avartar: widget.chatModel.isGroup
-                                  ? messages[index].author
-                                  : widget.chatModel.userName,
-                              path: messages[index].image,
-                              message: messages[index].text,
-                              time: messages[index].timestamp,
+                          return ReplyMessengerCard(
+                              userId: sourceChat != null
+                                  ? sourceChat!.id ?? ""
+                                  : "",
+                              chatMM: messages[index],
                               timeAfter: index < messages.length - 1
                                   ? messages[index + 1].timestamp
                                   : DateTime.parse('2010-01-01'),
-                              isGroup: widget.chatModel.isGroup,
-                            );
-                          } else {
-                            return ReplyCard(
-                              avartar: widget.chatModel.isGroup
-                                  ? messages[index].author
-                                  : widget.chatModel.userName,
-                              message: messages[index].text,
-                              time: messages[index].timestamp,
-                              timeAfter: index < messages.length - 1
-                                  ? messages[index + 1].timestamp
-                                  : DateTime.parse('2010-01-01'),
-                              isGroup: widget.chatModel.isGroup,
-                            );
-                          }
+                              setReply: setReply);
                         }
                       },
                     ),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: SizedBox(
-                      height: 70,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width - 60,
-                                child: Card(
-                                  // ignore: prefer_const_constructors
-                                  margin: EdgeInsets.only(
-                                      left: 2, right: 2, bottom: 8),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25)),
-                                  child: TextFormField(
-                                    controller: _textEditingController,
-                                    focusNode: focusNode,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    keyboardType: TextInputType.multiline,
-                                    maxLength: 100,
-                                    minLines: 1,
-                                    maxLines: 3,
-                                    onChanged: (value) {
-                                      if (value.isNotEmpty) {
-                                        setState(() {
-                                          sendButton = true;
-                                        });
-                                      } else {
-                                        setState(() {
-                                          sendButton = false;
-                                        });
-                                      }
-                                    },
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: 'Type of message',
-                                      counterText: "",
-                                      contentPadding: const EdgeInsets.all(5),
-                                      prefixIcon: IconButton(
-                                        icon: const Icon(Icons.emoji_emotions),
-                                        onPressed: () {
-                                          focusNode.unfocus();
-                                          focusNode.canRequestFocus = false;
-                                          setState(() {
-                                            show = !show;
-                                          });
-                                        },
-                                      ),
-                                      suffixIcon: Row(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        reply != null
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border(
+                                    top: BorderSide(
+                                        width: 1.0,
+                                        color: Colors.grey.shade300),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
                                         mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              showModalBottomSheet(
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  context: context,
-                                                  builder: (builder) =>
-                                                      bottomsheet());
-                                            },
-                                            icon: const Icon(Icons.attach_file),
+                                          Text(
+                                            "Đang trả lời ${reply!['userReply']}",
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                          IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                popTime = 2;
-                                              });
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (builder) =>
-                                                      CameraScreen(
-                                                    onImageSend: onImageSend,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            icon: const Icon(Icons.camera_alt),
+                                          const SizedBox(
+                                            height: 2,
                                           ),
+                                          Text(
+                                            reply!['textReply'] ?? "",
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.grey.shade700),
+                                            maxLines: 1,
+                                          )
                                         ],
                                       ),
                                     ),
-                                  ),
+                                    IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            reply = null;
+                                          });
+                                        },
+                                        icon: const Icon(Icons.close))
+                                  ],
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: 8, right: 5, left: 2),
-                                child: CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor: const Color(0xFF128C7E),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      if (sendButton) {
-                                        // _scrollController.animateTo(
-                                        //     _scrollController
-                                        //         .position.maxScrollExtent,
-                                        //     duration: const Duration(
-                                        //         milliseconds: 300),
-                                        //     curve: Curves.easeOut);
-                                        sendMessage(
-                                          _textEditingController.text,
-                                          "",
-                                        );
-                                        _textEditingController.clear();
-                                        setState(() {
-                                          sendButton = false;
-                                        });
-                                      }
-                                    },
-                                    icon: Icon(
-                                      sendButton ? Icons.send : Icons.mic,
-                                      color: Colors.white,
+                              )
+                            : Container(),
+                        SizedBox(
+                          height: 70,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width - 60,
+                                    child: Card(
+                                      // ignore: prefer_const_constructors
+                                      margin: EdgeInsets.only(
+                                          left: 2, right: 2, bottom: 8),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25)),
+                                      child: TextFormField(
+                                        controller: _textEditingController,
+                                        focusNode: focusNode,
+                                        textAlignVertical:
+                                            TextAlignVertical.center,
+                                        keyboardType: TextInputType.multiline,
+                                        maxLength: 100,
+                                        minLines: 1,
+                                        maxLines: 3,
+                                        onChanged: (value) {
+                                          if (value.isNotEmpty) {
+                                            setState(() {
+                                              sendButton = true;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              sendButton = false;
+                                            });
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'Type of message',
+                                          counterText: "",
+                                          contentPadding:
+                                              const EdgeInsets.all(5),
+                                          prefixIcon: IconButton(
+                                            icon: const Icon(
+                                                Icons.emoji_emotions),
+                                            onPressed: () {
+                                              focusNode.unfocus();
+                                              focusNode.canRequestFocus = false;
+                                              setState(() {
+                                                show = !show;
+                                              });
+                                            },
+                                          ),
+                                          suffixIcon: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  showModalBottomSheet(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      context: context,
+                                                      builder: (builder) =>
+                                                          bottomsheet());
+                                                },
+                                                icon: const Icon(
+                                                    Icons.attach_file),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    popTime = 2;
+                                                  });
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (builder) =>
+                                                          CameraScreen(
+                                                        onImageSend:
+                                                            onImageSend,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                icon: const Icon(
+                                                    Icons.camera_alt),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 8, right: 5, left: 2),
+                                    child: CircleAvatar(
+                                      radius: 25,
+                                      backgroundColor: const Color(0xFF128C7E),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          if (sendButton) {
+                                            // _scrollController.animateTo(
+                                            //     _scrollController
+                                            //         .position.maxScrollExtent,
+                                            //     duration: const Duration(
+                                            //         milliseconds: 300),
+                                            //     curve: Curves.easeOut);
+                                            sendMessage(
+                                              "text",
+                                              _textEditingController.text,
+                                            );
+                                            _textEditingController.clear();
+                                            setState(() {
+                                              sendButton = false;
+                                            });
+                                          }
+                                        },
+                                        icon: Icon(
+                                          sendButton ? Icons.send : Icons.mic,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
+                              show ? emojiSelect() : Container(),
                             ],
                           ),
-                          show ? emojiSelect() : Container(),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -397,9 +446,11 @@ class _IndividualPageState extends State<IndividualPage> {
     var responseAvartar = await networkHandler.get("/user/get/image/$userName");
     // ignore: unnecessary_null_comparison
     if (responseAvartar.toString() == null) {
+      // ignore: avoid_print
       print('null');
       return "";
     }
+    // ignore: avoid_print
     print(responseAvartar.toString());
     return responseAvartar.toString();
   }
@@ -407,16 +458,10 @@ class _IndividualPageState extends State<IndividualPage> {
   void fetchData() async {
     var responseUser = await networkHandler.get("/user/getData");
     UserModel userModel = UserModel.fromJson(responseUser);
+    // ignore: avoid_print
     print(userModel);
     setState(() {
-      sourceChat = ChatModel(
-          userName: userModel.username,
-          displayName: userModel.displayName,
-          avatarImage:
-              userModel.avatarImage == null ? "" : userModel.avatarImage!,
-          isGroup: false,
-          timestamp: '03:00',
-          currentMessage: 'currentMessage');
+      sourceChat = userModel;
     });
     Map<String, String> body = {"partition": widget.chatModel.userName};
     String urlChat = widget.chatModel.isGroup
@@ -428,14 +473,14 @@ class _IndividualPageState extends State<IndividualPage> {
       listChatMessagesModel =
           ListChatMessagesModel.fromJson(responseChatMessage);
       var listChatMessages = listChatMessagesModel.data;
-      print(listChatMessages);
+      // print(listChatMessages);
       listChatMessages1 = listChatMessages;
     }
-    print(listChatMessages1);
+    // print(listChatMessages1);
     var relation = await networkHandler
         .get("/user/get/relationship/${widget.chatModel.userName}");
-    print(widget.chatModel.userName);
-    print(relation);
+    // print(widget.chatModel.userName);
+    // print(relation);
 
     setState(() {
       messages = listChatMessages1!;
@@ -461,8 +506,9 @@ class _IndividualPageState extends State<IndividualPage> {
         setMessage(
           msg["author"],
           msg["partition"],
+          msg["type"],
           msg["message"],
-          msg["path"],
+          msg["reply"],
         );
         _scrollController.animateTo(_scrollController.position.maxScrollExtent,
             duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
@@ -472,26 +518,32 @@ class _IndividualPageState extends State<IndividualPage> {
     print(socket.connected);
   }
 
-  Future<void> sendMessage(String text, String image) async {
+  Future<void> sendMessage(String type, String text) async {
     //database
-    Map<String, String> data = {
+    var data = {
       "author": sourceChat!.userName,
       "partition": widget.chatModel.userName,
       "isGroup": widget.chatModel.isGroup.toString(),
+      "type": type,
       "text": text,
-      "image": image
+      "reply": reply != null ? reply!['id'] : "",
     };
-    var responseSend = await networkHandler.post("/chatmessage/add", data);
+    var responseSend = await networkHandler.post1("/chatmessage/add", data);
     // ignore: avoid_print
     print(responseSend);
 
     //socket
-    setMessage(sourceChat!.userName, widget.chatModel.userName, text, image);
+    setMessage(sourceChat!.userName, widget.chatModel.userName, type, text,
+        reply != null ? reply!['id'] ?? "" : "");
     socket.emit("message", {
       "message": text,
       "sourceId": sourceChat!.userName,
       "targetId": widget.chatModel.isGroup,
-      "path": image,
+      "type": type,
+      "reply": reply != null ? reply!['id'] : "",
+    });
+    setState(() {
+      reply = null;
     });
   }
 
@@ -505,47 +557,58 @@ class _IndividualPageState extends State<IndividualPage> {
       popTime = 0;
     });
 
-    //add Image
-    var request =
-        http.MultipartRequest("POST", Uri.parse("$_url/image/addimage"));
-    request.files.add(await http.MultipartFile.fromPath("img", path));
-    request.headers.addAll({
-      "Content-type": "multipart/form-data",
-    });
-    http.StreamedResponse response = await request.send();
-    var httpResponse = await http.Response.fromStream(response);
-    var data = json.decode(httpResponse.body);
-    print(data['path']);
+    try {
+      setMessage(sourceChat!.userName, widget.chatModel.userName, "image", path,
+          reply != null ? reply!['id'] ?? "" : "");
 
-    //send DB
-    Map<String, String> dataMap = {
-      "author": sourceChat!.userName,
-      "partition": widget.chatModel.userName,
-      "isGroup": widget.chatModel.isGroup.toString(),
-      "text": message,
-      "image": data['path']
-    };
-    var responseSend = await networkHandler.post("/chatmessage/add", dataMap);
-    print(responseSend);
+      //add Image
+      var request =
+          http.MultipartRequest("POST", Uri.parse("$_url/image/addimage"));
+      request.files.add(await http.MultipartFile.fromPath("img", path));
+      request.headers.addAll({
+        "Content-type": "multipart/form-data",
+      });
+      http.StreamedResponse response = await request.send();
+      var httpResponse = await http.Response.fromStream(response);
+      var data = json.decode(httpResponse.body);
+      // print(data['path']);
 
-    //send Socket
-    setMessage(sourceChat!.userName, widget.chatModel.userName, message, path);
-    // setMessage(message, data['path']);
-    socket.emit("message", {
-      "message": message,
-      "sourceId": sourceChat!.userName,
-      "targetId": widget.chatModel.userName,
-      "path": data['path'],
-    });
+      //send DB
+      Map<String, String> dataMap = {
+        "author": sourceChat!.userName,
+        "partition": widget.chatModel.userName,
+        "isGroup": widget.chatModel.isGroup.toString(),
+        "type": "image",
+        "text": data['path'],
+        "reply": reply != null ? reply!['id'] ?? "" : "",
+      };
+      await networkHandler.post("/chatmessage/add", dataMap);
+      // print(responseSend);
+
+      //send Socket
+      socket.emit("message", {
+        "message": message,
+        "sourceId": sourceChat!.userName,
+        "targetId": widget.chatModel.userName,
+        "type": "image",
+        "text": data['path'],
+        "reply": reply != null ? reply!['id'] ?? "" : "",
+      });
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
   }
 
-  void setMessage(String author, String partition, String text, String image) {
+  void setMessage(
+      String author, String partition, String type, String text, String reply) {
     ChatMessagesModel messageModel = ChatMessagesModel(
       author: author,
       partition: partition,
+      type: type,
       text: text,
-      image: image,
       timestamp: DateTime.now(),
+      reply: reply,
       // DateTime.now().toString().substring(11, 16),
     );
     setState(() {
@@ -556,7 +619,7 @@ class _IndividualPageState extends State<IndividualPage> {
   Future<void> setRelationship(String userRela, String chatterRela) async {
     var responseCheck = await networkHandler
         .get("/user/checkrelationship/${widget.chatModel.userName}");
-    print(responseCheck['status']);
+    // print(responseCheck['status']);
     var body = {
       "userName": sourceChat!.userName,
       "relationship": {
@@ -573,16 +636,20 @@ class _IndividualPageState extends State<IndividualPage> {
     };
     if (responseCheck['status'] == false) {
       var response = await networkHandler.post1("/user/add/relationship", body);
+      // ignore: avoid_print
       print(response);
       var response1 =
           await networkHandler.post1("/user/add/relationship", body1);
+      // ignore: avoid_print
       print(response1);
     } else {
       var response =
           await networkHandler.post1("/user/update/relationship", body);
+      // ignore: avoid_print
       print(response);
       var response1 =
           await networkHandler.post1("/user/update/relationship", body1);
+      // ignore: avoid_print
       print(response1);
     }
   }
@@ -617,16 +684,14 @@ class _IndividualPageState extends State<IndividualPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.person_add_alt_outlined,
               color: Colors.grey,
             ),
-            SizedBox(
-              width: 5,
-            ),
+            const SizedBox(width: 5),
             Text(
               relationship == "Người lạ" ? "Kết bạn" : relationship,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -651,8 +716,26 @@ class _IndividualPageState extends State<IndividualPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  iconcreation(Icons.insert_drive_file, Colors.indigo,
-                      'Document', () {}),
+                  iconcreation(
+                      Icons.insert_drive_file, Colors.indigo, 'Document',
+                      () async {
+                    result = await FilePicker.platform
+                        .pickFiles(allowMultiple: true);
+                    if (result != null) {
+                      files = result!.paths.map((path) => File(path!)).toList();
+                      // PlatformFile file = result!.files.first;
+                      File file1 = files![0];
+                      String fileName =
+                          await FileViewModel(file1.path).uploadFile();
+                      // ignore: avoid_print
+                      print('fileName: $fileName');
+                      // print('file.name: ${file.name}');
+                      // print('file.path: ${file.path}');
+                      // print('file.size: ${file.size}');
+                    } else {
+                      // User canceled the picker
+                    }
+                  }),
                   const SizedBox(width: 40),
                   iconcreation(
                     Icons.camera_alt,
@@ -751,38 +834,40 @@ class _IndividualPageState extends State<IndividualPage> {
       child: SizedBox(
         height: 250,
         child: EmojiPicker(
-            onEmojiSelected: (Category category, Emoji emoji) {
-              _onEmojiSelected(emoji);
-            },
-            onBackspacePressed: _onBackspacePressed,
-            config: const Config(
-                columns: 7,
-                // Issue: https://github.com/flutter/flutter/issues/28894
-                emojiSizeMax: 32,
-                verticalSpacing: 0,
-                horizontalSpacing: 0,
-                gridPadding: EdgeInsets.zero,
-                initCategory: Category.RECENT,
-                bgColor: Color(0xFFF2F2F2),
-                indicatorColor: Colors.blue,
-                iconColor: Colors.grey,
-                iconColorSelected: Colors.blue,
-                progressIndicatorColor: Colors.blue,
-                backspaceColor: Colors.blue,
-                skinToneDialogBgColor: Colors.white,
-                skinToneIndicatorColor: Colors.grey,
-                enableSkinTones: true,
-                showRecentsTab: true,
-                recentsLimit: 28,
-                replaceEmojiOnLimitExceed: false,
-                noRecents: Text(
-                  'No Recents',
-                  style: TextStyle(fontSize: 20, color: Colors.black26),
-                  textAlign: TextAlign.center,
-                ),
-                tabIndicatorAnimDuration: kTabScrollDuration,
-                categoryIcons: CategoryIcons(),
-                buttonMode: ButtonMode.MATERIAL)),
+          onEmojiSelected: (Category category, Emoji emoji) {
+            _onEmojiSelected(emoji);
+          },
+          onBackspacePressed: _onBackspacePressed,
+          config: const Config(
+            columns: 7,
+            // Issue: https://github.com/flutter/flutter/issues/28894
+            emojiSizeMax: 32,
+            verticalSpacing: 0,
+            horizontalSpacing: 0,
+            gridPadding: EdgeInsets.zero,
+            initCategory: Category.RECENT,
+            bgColor: Color(0xFFF2F2F2),
+            indicatorColor: Colors.blue,
+            iconColor: Colors.grey,
+            iconColorSelected: Colors.blue,
+            progressIndicatorColor: Colors.blue,
+            backspaceColor: Colors.blue,
+            skinToneDialogBgColor: Colors.white,
+            skinToneIndicatorColor: Colors.grey,
+            enableSkinTones: true,
+            showRecentsTab: true,
+            recentsLimit: 28,
+            replaceEmojiOnLimitExceed: false,
+            noRecents: Text(
+              'No Recents',
+              style: TextStyle(fontSize: 20, color: Colors.black26),
+              textAlign: TextAlign.center,
+            ),
+            tabIndicatorAnimDuration: kTabScrollDuration,
+            categoryIcons: CategoryIcons(),
+            buttonMode: ButtonMode.MATERIAL,
+          ),
+        ),
       ),
     );
   }

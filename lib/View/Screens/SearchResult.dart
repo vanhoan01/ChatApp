@@ -1,5 +1,5 @@
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/View/CustomUI/SearchItem.dart';
-import 'package:chatapp/Model/ChatModel.dart';
 import 'package:flutter/material.dart';
 
 class SearchResult extends StatefulWidget {

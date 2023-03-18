@@ -1,11 +1,11 @@
 // ignore_for_file: file_names
 
+import 'package:chatapp/Model/List/ListChatModel.dart';
+import 'package:chatapp/Model/List/ListChatterModel.dart';
+import 'package:chatapp/Model/List/ListConversationModel.dart';
+import 'package:chatapp/Model/Model/ChatModel.dart';
+import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/View/CustomUI/CustomCard.dart';
-import 'package:chatapp/Model/ChatModel.dart';
-import 'package:chatapp/Model/ListChatModel.dart';
-import 'package:chatapp/Model/ListChatterModel.dart';
-import 'package:chatapp/Model/ListConversationModel.dart';
-import 'package:chatapp/Model/userModel.dart';
 import 'package:chatapp/View/Screens/SelectContact.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +49,9 @@ class _ChatPageState extends State<ChatPage> {
         if (last != null) {
           timestamp = last['timestamp'];
           currentMessage =
-              last['image'].isNotEmpty ? "Đã gửi một hình ảnh" : last['text'];
+              last['type'] == "image" ? "Đã gửi một hình ảnh" : last['text'];
         }
+        // ignore: avoid_print
         print(listChatters.elementAt(i).userName);
         chatModel = ChatModel(
             userName: listChatters.elementAt(i).userName,
@@ -79,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
         String currentMessage = "";
         if (last != null) {
           timestamp = last['timestamp'];
-          currentMessage = last['image'].isNotEmpty ? "Hình ảnh" : last['text'];
+          currentMessage = last['type'] == "image" ? "Hình ảnh" : last['text'];
         }
         chatModel = ChatModel(
             userName: listConversations.elementAt(i).id,
@@ -106,7 +107,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       chatmodels = chatModelChatterConversation;
       sourceChat = ChatModel(
-          userName: userModel.username,
+          userName: userModel.userName,
           displayName: userModel.displayName,
           avatarImage:
               userModel.avatarImage == null ? "" : userModel.avatarImage!,
@@ -122,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (builder) => SelectContact()));
+              MaterialPageRoute(builder: (builder) => const SelectContact()));
         },
         child: const Icon(
           Icons.chat,

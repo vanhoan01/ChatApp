@@ -1,8 +1,8 @@
+// ignore_for_file: file_names
+
+import 'package:chatapp/Model/List/ListChatterModel.dart';
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/View/CustomUI/SearchItem.dart';
-import 'package:chatapp/Model/ChatModel.dart';
-import 'package:chatapp/Model/ListChatterModel.dart';
-import 'package:chatapp/Model/ListConversationModel.dart';
-import 'package:chatapp/Model/userModel.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
 
@@ -73,6 +73,7 @@ class SearchScreen extends SearchDelegate {
         chatModelChatter.add(chatModel);
       }
     }
+    // ignore: avoid_print
     print(chatModelChatter);
     // Map<String, String> data = {};
     // listChatModel = ListChatModel.fromJson(responseChatters);
@@ -113,7 +114,7 @@ class SearchScreen extends SearchDelegate {
         onPressed: () {
           query = '';
         },
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
       ),
     ];
   }
@@ -133,7 +134,7 @@ class SearchScreen extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     List<ChatModel> matchQuery = [];
-    if (query.trim().length > 0) {
+    if (query.trim().isNotEmpty) {
       fetchData(query.trim());
       matchQuery = chatmodels;
       print(matchQuery);
@@ -153,7 +154,7 @@ class SearchScreen extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<ChatModel> matchQuery = [];
-    if (query.trim().length > 0) {
+    if (query.trim().isNotEmpty) {
       fetchData(query.trim());
       matchQuery = chatmodels;
       print(matchQuery);

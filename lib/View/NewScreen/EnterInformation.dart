@@ -1,4 +1,5 @@
-import 'package:chatapp/Model/ChatModel.dart';
+// ignore_for_file: file_names
+
 import 'package:chatapp/View/Screens/Homescreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
 class EnterInformation extends StatefulWidget {
-  const EnterInformation({Key? key, this.number, this.countryCode});
+  const EnterInformation({super.key, this.number, this.countryCode});
   final String? number;
   final String? countryCode;
 
@@ -17,12 +18,12 @@ class EnterInformation extends StatefulWidget {
 class _EnterInformationState extends State<EnterInformation> {
   final _globalkey = GlobalKey<FormState>();
   NetworkHandler networkHandler = NetworkHandler();
-  final storage = new FlutterSecureStorage();
+  final storage = const FlutterSecureStorage();
 
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _displayNameController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _passwordController1 = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _displayNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordController1 = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +41,8 @@ class _EnterInformationState extends State<EnterInformation> {
         ),
       ),
       body: Container(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         child: Form(
           key: _globalkey,
           child: SingleChildScrollView(
@@ -47,10 +50,8 @@ class _EnterInformationState extends State<EnterInformation> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 20,
-                ),
-                Center(
+                const SizedBox(height: 20),
+                const Center(
                   child: Text(
                     "Vui lòng cung cấp các thông tin sau",
                     style: TextStyle(
@@ -58,9 +59,7 @@ class _EnterInformationState extends State<EnterInformation> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey[200],
@@ -70,11 +69,9 @@ class _EnterInformationState extends State<EnterInformation> {
                     color: Colors.blueGrey[500],
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.teal,
@@ -86,11 +83,12 @@ class _EnterInformationState extends State<EnterInformation> {
                   child: TextFormField(
                     controller: _usernameController,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return "Password can't be empty";
+                      }
                       return null;
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(5),
                       hintText: "Nhập tài khoản",
                       focusedBorder: UnderlineInputBorder(
@@ -102,11 +100,9 @@ class _EnterInformationState extends State<EnterInformation> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.teal,
@@ -118,14 +114,16 @@ class _EnterInformationState extends State<EnterInformation> {
                   child: TextFormField(
                     controller: _passwordController,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return "Password can't be empty";
-                      if (value.length < 8)
+                      }
+                      if (value.length < 8) {
                         return "Password lenght must have >=8";
+                      }
                       return null;
                     },
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(5),
                       hintText: "Nhập mật khẩu",
                       focusedBorder: UnderlineInputBorder(
@@ -137,11 +135,9 @@ class _EnterInformationState extends State<EnterInformation> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.teal,
@@ -154,13 +150,15 @@ class _EnterInformationState extends State<EnterInformation> {
                     obscureText: true,
                     controller: _passwordController1,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return "Password can't be empty";
-                      if (value.length < 8)
+                      }
+                      if (value.length < 8) {
                         return "Password lenght must have >=8";
+                      }
                       return null;
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(5),
                       hintText: "Nhập lại mật khẩu",
                       focusedBorder: UnderlineInputBorder(
@@ -172,11 +170,9 @@ class _EnterInformationState extends State<EnterInformation> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.teal,
@@ -188,19 +184,18 @@ class _EnterInformationState extends State<EnterInformation> {
                   child: TextFormField(
                     controller: _displayNameController,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return "Password can't be empty";
+                      }
                       return null;
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(5),
                       hintText: "Nhập họ và tên",
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 50,
-                ),
+                const SizedBox(height: 50),
                 ElevatedButton(
                   onPressed: () async {
                     // setState(() {
@@ -216,6 +211,7 @@ class _EnterInformationState extends State<EnterInformation> {
                         "phoneNumber": widget.countryCode.toString() +
                             widget.number.toString(),
                       };
+                      // ignore: avoid_print
                       print(data);
                       var responseRegister =
                           await networkHandler.post2("/user/register", data);
@@ -239,6 +235,7 @@ class _EnterInformationState extends State<EnterInformation> {
                             response.statusCode == 201) {
                           Map<String, dynamic> output =
                               json.decode(response.body);
+                          // ignore: avoid_print
                           print(output["token"]);
                           await storage.write(
                               key: "token", value: output["token"]);
@@ -246,36 +243,37 @@ class _EnterInformationState extends State<EnterInformation> {
                           //   validate = true;
                           //   circular = false;
                           // });
+                          // ignore: use_build_context_synchronously
                           Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Homescreen(),
+                                builder: (context) => const Homescreen(),
                               ),
                               (route) => false);
                         } else {
+                          // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Netwok Error")));
+                              const SnackBar(content: Text("Netwok Error")));
                         }
                       }
                     }
                   },
-                  child: Text(
-                    "TIẾP",
-                    style: TextStyle(color: Colors.white),
-                  ),
                   style: ButtonStyle(
                     backgroundColor:
                         MaterialStateProperty.all<Color>(Colors.teal),
                     padding: MaterialStateProperty.all<EdgeInsets>(
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+                        const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10)),
+                  ),
+                  child: const Text(
+                    "TIẾP",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
             ),
           ),
         ),
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       ),
     );
   }

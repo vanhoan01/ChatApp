@@ -2,7 +2,12 @@
 
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
+import 'package:chatapp/View/Pages/MenuScreen.dart';
 import 'package:chatapp/View/Profile/Screens/ProfileEdit.dart';
+import 'package:chatapp/View/Profile/Tabs/SavedTab.dart';
+import 'package:chatapp/View/Profile/Tabs/FileTab.dart';
+import 'package:chatapp/View/Profile/Tabs/ImageTab.dart';
+import 'package:chatapp/View/Profile/Tabs/LikeTab.dart';
 import 'package:chatapp/ViewModel/Profile/UserViewModel.dart';
 import 'package:flutter/material.dart';
 
@@ -12,14 +17,17 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage>
+    with SingleTickerProviderStateMixin {
   UserViewModel userViewModel = UserViewModel();
   UserModel? userModel;
+  TabController? _tabController;
 
   @override
   void initState() {
     super.initState();
     getUser();
+    _tabController = TabController(length: 4, vsync: this, initialIndex: 0);
   }
 
   void getUser() async {
@@ -33,14 +41,28 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+        backgroundColor: Colors.white,
+        title: Text(
+          userModel != null ? userModel!.userName : "",
+          style: const TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+          maxLines: 1,
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.person_add_alt, color: Colors.black),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MenuScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.more_vert, color: Colors.black),
           )
         ],
       ),
@@ -76,14 +98,22 @@ class _ProfilePageState extends State<ProfilePage> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(
-              userModel != null ? userModel!.biography ?? "" : "",
-              style: const TextStyle(fontSize: 16),
-            ),
+            userModel != null
+                ? userModel!.biography != null
+                    ? Text(
+                        userModel != null ? userModel!.biography ?? "" : "",
+                        style: const TextStyle(fontSize: 16),
+                      )
+                    : Container()
+                : Container(),
             const SizedBox(height: 15),
             OptionItem(Icons.people_outlined, "500 người bạn"),
-            OptionItem(
-                Icons.link, userModel != null ? userModel!.link ?? "" : ""),
+            userModel != null
+                ? userModel!.link != null
+                    ? OptionItem(Icons.link,
+                        userModel != null ? userModel!.link ?? "" : "")
+                    : Container()
+                : Container(),
             const SizedBox(height: 15),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -131,7 +161,36 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(width: 15),
               ],
-            )
+            ),
+            const SizedBox(height: 15),
+            Column(
+              children: [
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: Colors.black,
+                  labelColor: Colors.black,
+                  labelPadding: const EdgeInsets.all(2),
+                  tabs: const [
+                    Tab(text: "Ảnh Video"),
+                    Tab(text: "Tệp"),
+                    Tab(text: "Đã Lưu"),
+                    Tab(text: "Đã Thích"),
+                  ],
+                ),
+                SizedBox(
+                  height: 500,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: const [
+                      ImageTab(),
+                      FileTab(),
+                      SavedTab(),
+                      LikeTab(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

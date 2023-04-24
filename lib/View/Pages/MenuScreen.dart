@@ -41,7 +41,7 @@ class _MenuScreenState extends State<MenuScreen> {
         title: const Text("Tùy chọn"),
       ),
       body: ListView(children: [
-        UserItem(),
+        // UserItem(),
         OptionItem(Icons.account_tree_outlined, Colors.purple,
             "Chuyển tài khoản", null),
         OptionItem(

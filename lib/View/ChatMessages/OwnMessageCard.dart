@@ -2,12 +2,15 @@
 
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ReactModel.dart';
+import 'package:chatapp/View/ChatMessages/Compoments/MessagesAudioView.dart';
 import 'package:chatapp/View/ChatMessages/Compoments/MessagesFileView.dart';
 import 'package:chatapp/View/ChatMessages/Compoments/MessagesImageView.dart';
+import 'package:chatapp/View/ChatMessages/Compoments/MessagesLocationView.dart';
 import 'package:chatapp/View/ChatMessages/Compoments/MessagesTextView.dart';
 import 'package:chatapp/View/ChatPage/Compoments/PopupMenuWidget.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
 import 'package:chatapp/ViewModel/ChatPage/text_time_vm.dart';
+import 'package:chatapp/ViewModel/Profile/UserViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -76,10 +79,28 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
                               text: chatReply != null ? chatReply!.text : "",
                               reply: true,
                             )
-                          : MessagesImageView(
-                              path: chatReply != null ? chatReply!.text : "",
-                              reply: true,
-                            ),
+                          : widget.chatMM.type == "image"
+                              ? MessagesImageView(
+                                  path:
+                                      chatReply != null ? chatReply!.text : "",
+                                  reply: true,
+                                )
+                              : widget.chatMM.type == "file"
+                                  ? MessagesFileView(
+                                      name: widget.chatMM.text,
+                                      size: widget.chatMM.size ?? 0,
+                                      reply: true,
+                                    )
+                                  : widget.chatMM.type == "audio"
+                                      ? MessagesAudioView(
+                                          name: widget.chatMM.text,
+                                          size: widget.chatMM.size ?? 0,
+                                          reply: true,
+                                        )
+                                      : MessagesLocationView(
+                                          name: widget.chatMM.text,
+                                          reply: true,
+                                        ),
                     ),
                   )
                 : Container(),
@@ -118,10 +139,22 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
                               path: widget.chatMM.text,
                               reply: false,
                             )
-                          : MessagesFileView(
-                              path: widget.chatMM.text,
-                              reply: false,
-                            ),
+                          : widget.chatMM.type == "file"
+                              ? MessagesFileView(
+                                  name: widget.chatMM.text,
+                                  size: widget.chatMM.size ?? 0,
+                                  reply: false,
+                                )
+                              : widget.chatMM.type == "audio"
+                                  ? MessagesAudioView(
+                                      name: widget.chatMM.text,
+                                      size: widget.chatMM.size ?? 0,
+                                      reply: false,
+                                    )
+                                  : MessagesLocationView(
+                                      name: widget.chatMM.text,
+                                      reply: false,
+                                    ),
                 ),
               ),
             ),
@@ -398,6 +431,14 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
           () {
             // ignore: avoid_print
             print("Ghim");
+          },
+        ),
+        option(
+          Icons.bookmark,
+          "Lưu lại",
+          () {
+            UserViewModel userViewModel = UserViewModel();
+            userViewModel.addSaved(widget.chatMM.id ?? "");
           },
         ),
         option(

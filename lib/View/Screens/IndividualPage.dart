@@ -8,11 +8,13 @@ import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/View/ChatMessages/OwnMessageCard.dart';
 import 'package:chatapp/View/ChatMessages/ReplyMessengerCard.dart';
+import 'package:chatapp/View/ChatPage/Screens/LocationShareMap.dart';
 import 'package:chatapp/View/Screens/CameraScreen.dart';
 import 'package:chatapp/View/Screens/CameraViewPage.dart';
 import 'package:chatapp/View/Screens/Homescreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:chatapp/View/InformationUser/InformationUser.dart';
+import 'package:chatapp/ViewModel/File/AudioViewModel.dart';
 import 'package:chatapp/ViewModel/File/FileViewModel.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
@@ -84,6 +86,7 @@ class _IndividualPageState extends State<IndividualPage> {
     _url = networkHandler.getURL();
     // _urlImage = networkHandler.getURLImage();
     connect();
+
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -212,7 +215,7 @@ class _IndividualPageState extends State<IndividualPage> {
                             chatMM: messages[index],
                             timeAfter: index < messages.length - 1
                                 ? messages[index + 1].timestamp
-                                : DateTime.parse('2010-01-01'),
+                                : DateTime.parse('2020-01-01'),
                             userId:
                                 sourceChat != null ? sourceChat!.id ?? "" : "",
                             setReply: setReply,
@@ -495,10 +498,11 @@ class _IndividualPageState extends State<IndividualPage> {
     });
     // ignore: await_only_futures
     await socket.connect();
-    socket.emit("signin", sourceChat!.userName);
+
     socket.onConnect((data) {
       // ignore: avoid_print
       print("Connected");
+
       socket.on("message", (msg) {
         // ignore: avoid_print
         print(msg);
@@ -507,7 +511,7 @@ class _IndividualPageState extends State<IndividualPage> {
           msg["author"],
           msg["partition"],
           msg["type"],
-          msg["message"],
+          msg["text"],
           msg["reply"],
         );
         _scrollController.animateTo(_scrollController.position.maxScrollExtent,
@@ -515,6 +519,7 @@ class _IndividualPageState extends State<IndividualPage> {
       });
     });
     // ignore: avoid_print
+    socket.emit("signin", sourceChat!.userName);
     print(socket.connected);
   }
 
@@ -532,24 +537,73 @@ class _IndividualPageState extends State<IndividualPage> {
     // ignore: avoid_print
     print(responseSend);
 
-    //socket
+    //local
     setMessage(sourceChat!.userName, widget.chatModel.userName, type, text,
         reply != null ? reply!['id'] ?? "" : "");
+
+    //socket
     socket.emit("message", {
-      "message": text,
+      "text": text,
       "sourceId": sourceChat!.userName,
-      "targetId": widget.chatModel.isGroup,
+      "targetId": widget.chatModel.userName,
       "type": type,
       "reply": reply != null ? reply!['id'] : "",
     });
+
     setState(() {
       reply = null;
     });
   }
 
-  void onImageSend(String path, String message) async {
+  Future<void> sendFile(String fileName, int size, String type) async {
+    //database
+    var data = {
+      "author": sourceChat!.userName,
+      "partition": widget.chatModel.userName,
+      "isGroup": widget.chatModel.isGroup.toString(),
+      "type": type,
+      "text": fileName,
+      "size": '$size',
+      "reply": reply != null ? reply!['id'] : "",
+    };
+    var responseSend = await networkHandler.post1("/chatmessage/add", data);
     // ignore: avoid_print
-    print("Hey there working $message");
+    print(responseSend);
+
+    //local
+    ChatMessagesModel messageModel = ChatMessagesModel(
+      author: sourceChat!.userName,
+      partition: widget.chatModel.userName,
+      isGroup: widget.chatModel.isGroup,
+      type: type,
+      text: fileName,
+      size: size,
+      timestamp: DateTime.now(),
+      reply: reply != null ? reply!['id'] : "",
+      // DateTime.now().toString().substring(11, 16),
+    );
+    print("messages: $messages");
+    setState(() {
+      messages.insert(0, messageModel);
+    });
+    print("messages: $messages");
+
+    //socket
+    socket.emit("message", {
+      "text": fileName,
+      "sourceId": sourceChat!.userName,
+      "targetId": widget.chatModel.userName,
+      "type": type,
+      "size": size,
+      "reply": reply != null ? reply!['id'] : "",
+    });
+
+    setState(() {
+      reply = null;
+    });
+  }
+
+  void onImageSend(String path) async {
     for (var i = 0; i < popTime; i++) {
       Navigator.pop(context);
     }
@@ -587,7 +641,6 @@ class _IndividualPageState extends State<IndividualPage> {
 
       //send Socket
       socket.emit("message", {
-        "message": message,
         "sourceId": sourceChat!.userName,
         "targetId": widget.chatModel.userName,
         "type": "image",
@@ -611,9 +664,11 @@ class _IndividualPageState extends State<IndividualPage> {
       reply: reply,
       // DateTime.now().toString().substring(11, 16),
     );
+    print("messages: $messages");
     setState(() {
       messages.insert(0, messageModel);
     });
+    print("messages: $messages");
   }
 
   Future<void> setRelationship(String userRela, String chatterRela) async {
@@ -717,25 +772,43 @@ class _IndividualPageState extends State<IndividualPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   iconcreation(
-                      Icons.insert_drive_file, Colors.indigo, 'Document',
-                      () async {
-                    result = await FilePicker.platform
-                        .pickFiles(allowMultiple: true);
-                    if (result != null) {
-                      files = result!.paths.map((path) => File(path!)).toList();
-                      // PlatformFile file = result!.files.first;
-                      File file1 = files![0];
-                      String fileName =
-                          await FileViewModel(file1.path).uploadFile();
-                      // ignore: avoid_print
-                      print('fileName: $fileName');
-                      // print('file.name: ${file.name}');
-                      // print('file.path: ${file.path}');
-                      // print('file.size: ${file.size}');
-                    } else {
-                      // User canceled the picker
-                    }
-                  }),
+                    Icons.insert_drive_file,
+                    Colors.indigo,
+                    'Document',
+                    () async {
+                      result = await FilePicker.platform.pickFiles(
+                        allowMultiple: true,
+                        type: FileType.custom,
+                        allowedExtensions: [
+                          'docx',
+                          'pdf',
+                          'doc',
+                          'jar',
+                          'ppt',
+                          'pttx',
+                          'xls',
+                          'xlss',
+                          'txt',
+                          'zip',
+                          'rar'
+                        ],
+                      );
+                      if (result != null) {
+                        files =
+                            result!.paths.map((path) => File(path!)).toList();
+                        PlatformFile file1 = result!.files.first;
+                        // PlatformFile file1 = result!.files.elementAt(0);
+                        // File file2 = result!.files[0] as File;
+                        String fileName =
+                            await FileViewModel().uploadFile(file1.path!);
+                        sendFile(fileName, file1.size, 'file');
+                      } else {
+                        // User canceled the picker
+                      }
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                    },
+                  ),
                   const SizedBox(width: 40),
                   iconcreation(
                     Icons.camera_alt,
@@ -786,10 +859,25 @@ class _IndividualPageState extends State<IndividualPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  iconcreation(Icons.headset, Colors.orange, 'Audio', () {}),
+                  iconcreation(Icons.headset, Colors.orange, 'Audio', () async {
+                    var result = await FilePicker.platform
+                        .pickFiles(type: FileType.audio);
+                    if (result != null) {
+                      PlatformFile file = result.files.first;
+                      String fileName =
+                          await AudioViewModel().uploadAudio(file.path!);
+                      sendFile(fileName, file.size, 'audio');
+                    } else {
+                      // User canceled the picker
+                    }
+                    // ignore: use_build_context_synchronously
+                    Navigator.pop(context);
+                  }),
                   const SizedBox(width: 40),
-                  iconcreation(
-                      Icons.location_pin, Colors.teal, 'Location', () {}),
+                  iconcreation(Icons.location_pin, Colors.teal, 'Location', () {
+                    Navigator.pop(context);
+                    _navigateMapAndChoose();
+                  }),
                   const SizedBox(width: 40),
                   iconcreation(Icons.person, Colors.blue, 'Contact', () {}),
                 ],
@@ -798,6 +886,19 @@ class _IndividualPageState extends State<IndividualPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _navigateMapAndChoose() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LocationShareMap()),
+    );
+    // ignore: avoid_print
+    print("result: $result");
+    sendMessage(
+      "location",
+      result,
     );
   }
 

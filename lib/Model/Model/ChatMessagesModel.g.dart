@@ -14,6 +14,7 @@ ChatMessagesModel _$ChatMessagesModelFromJson(Map<String, dynamic> json) =>
       isGroup: json['isGroup'] as bool?,
       type: json['type'] as String,
       text: json['text'] as String,
+      size: json['size'] as int?,
       timestamp: DateTime.parse(json['timestamp'] as String),
       reacts: (json['reacts'] as List<dynamic>?)
           ?.map((e) => ReactModel.fromJson(e as Map<String, dynamic>))
@@ -29,6 +30,7 @@ Map<String, dynamic> _$ChatMessagesModelToJson(ChatMessagesModel instance) =>
       'isGroup': instance.isGroup,
       'type': instance.type,
       'text': instance.text,
+      'size': instance.size,
       'timestamp': instance.timestamp.toIso8601String(),
       'reacts': instance.reacts,
       'reply': instance.reply,

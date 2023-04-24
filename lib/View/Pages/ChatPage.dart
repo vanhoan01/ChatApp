@@ -6,9 +6,15 @@ import 'package:chatapp/Model/List/ListConversationModel.dart';
 import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/View/CustomUI/CustomCard.dart';
+import 'package:chatapp/View/Pages/MenuScreen.dart';
+import 'package:chatapp/View/Screens/CreateGroup.dart';
+import 'package:chatapp/View/Screens/LoginScreen.dart';
+import 'package:chatapp/View/Screens/SearchScreen.dart';
 import 'package:chatapp/View/Screens/SelectContact.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/View/Screens/UploadImage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ChatPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
@@ -26,6 +32,7 @@ class _ChatPageState extends State<ChatPage> {
   late ChatModel sourceChat;
   late final String url;
   List<ChatModel> chatmodels = [];
+  final storage = const FlutterSecureStorage();
 
   @override
   void initState() {
@@ -120,6 +127,77 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('SkyChat'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: SearchScreen(),
+              );
+            },
+            icon: const Icon(Icons.search),
+          ),
+          PopupMenuButton<String>(
+            offset: const Offset(-20, 45),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
+            onSelected: (value) {
+              if (value == "dangxuat") {
+                logout();
+              }
+              if (value == "New group") {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => const CreateGroup()));
+              }
+              if (value == "Settings") {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => const MenuScreen()));
+              }
+              if (value == "uploadimage") {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => const UploadImage()));
+              }
+              // ignore: avoid_print
+              print(value);
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem(
+                  value: 'New group',
+                  child: Text('Tạo nhóm mới'),
+                ),
+                const PopupMenuItem(
+                  value: 'Starred messages',
+                  child: Text('Tin nhắn quan trọng'),
+                ),
+                const PopupMenuItem(
+                  value: 'Settings',
+                  child: Text('Cài đặt'),
+                ),
+                const PopupMenuItem(
+                  value: 'dangxuat',
+                  child: Text('Đăng xuất'),
+                ),
+                const PopupMenuItem(
+                  value: 'uploadimage',
+                  child: Text('Upload image'),
+                ),
+              ];
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
@@ -138,6 +216,15 @@ class _ChatPageState extends State<ChatPage> {
             )
           : invite_friends(),
     );
+  }
+
+  void logout() async {
+    await storage.delete(key: "token");
+    // ignore: use_build_context_synchronously
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false);
   }
 
   // ignore: non_constant_identifier_names

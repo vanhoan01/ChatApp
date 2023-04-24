@@ -15,6 +15,7 @@ class ChatMessagesModel {
     this.isGroup,
     required this.type,
     required this.text,
+    this.size,
     required this.timestamp,
     this.reacts,
     this.reply,
@@ -27,6 +28,7 @@ class ChatMessagesModel {
   final bool? isGroup;
   final String type;
   final String text;
+  final int? size;
   final DateTime timestamp;
   final List<ReactModel>? reacts;
   final String? reply;

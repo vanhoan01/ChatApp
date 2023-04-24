@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/Model/List/ListChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 
 class ChatMessagesViewModel {
@@ -17,6 +18,57 @@ class ChatMessagesViewModel {
       print(e);
     }
     return chatMessagesModel!;
+  }
+
+  Future<List<ChatMessagesModel>> getPhotos() async {
+    List<ChatMessagesModel>? listChatMessagesModel = [];
+    try {
+      var resMessage = await networkHandler.get("/chatmessage/get/photos");
+      listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listChatMessagesModel!;
+  }
+
+  Future<List<ChatMessagesModel>> getFiles() async {
+    List<ChatMessagesModel>? listChatMessagesModel = [];
+    try {
+      var resMessage = await networkHandler.get("/chatmessage/get/files");
+      listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listChatMessagesModel!;
+  }
+
+  Future<List<ChatMessagesModel>> getProfileReacts() async {
+    List<ChatMessagesModel>? listChatMessagesModel = [];
+    try {
+      var resMessage =
+          await networkHandler.get("/chatmessage/get/profilereacts");
+
+      listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listChatMessagesModel!;
+  }
+
+  Future<List<ChatMessagesModel>> getSaveds() async {
+    List<ChatMessagesModel>? listChatMessagesModel = [];
+    try {
+      var resMessage = await networkHandler.get("/chatmessage/get/saveds");
+
+      listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listChatMessagesModel!;
   }
 
   Future<void> addReacts(String id, String userId, String react) async {

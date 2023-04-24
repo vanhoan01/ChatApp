@@ -8,17 +8,17 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: SafeArea(
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
-              Text(
-                "Welcom to WhatsApp",
+              const Text(
+                "Welcom to SkyChat",
                 style: TextStyle(
                   color: Colors.teal,
                   fontSize: 29,
@@ -44,7 +44,7 @@ class LandingScreen extends StatelessWidget {
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 17,
                     ),
@@ -55,8 +55,8 @@ class LandingScreen extends StatelessWidget {
                           color: Colors.grey[600],
                         ),
                       ),
-                      TextSpan(
-                        text: " Whatsapp Terns of Service and Privacy Policy",
+                      const TextSpan(
+                        text: " SkyChat Terns of Service and Privacy Policy",
                         style: TextStyle(
                           color: Colors.cyan,
                         ),
@@ -65,24 +65,25 @@ class LandingScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               InkWell(
                 onTap: () {
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (builder) => LoginPage()),
+                      MaterialPageRoute(
+                          builder: (builder) => const LoginPage()),
                       (route) => false);
                 },
-                child: Container(
+                child: SizedBox(
                   width: MediaQuery.of(context).size.width - 110,
                   height: 50,
                   child: Card(
-                    margin: EdgeInsets.all(0),
+                    margin: const EdgeInsets.all(0),
                     elevation: 8,
                     color: Colors.greenAccent[700],
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         "AGREE AND CONTINUE",
                         style: TextStyle(

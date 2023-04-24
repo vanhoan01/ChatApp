@@ -6,20 +6,20 @@ part "userModel.g.dart";
 
 @JsonSerializable()
 class UserModel {
-  UserModel({
-    this.id,
-    required this.partition,
-    required this.userName,
-    required this.password,
-    required this.displayName,
-    this.avatarImage,
-    this.biography,
-    this.lastSeenAt,
-    required this.phoneNumber,
-    this.conversations,
-    this.precense,
-    this.link,
-  });
+  UserModel(
+      {this.id,
+      required this.partition,
+      required this.userName,
+      required this.password,
+      required this.displayName,
+      this.avatarImage,
+      this.biography,
+      this.lastSeenAt,
+      required this.phoneNumber,
+      this.conversations,
+      this.precense,
+      this.link,
+      this.saved});
   final String? id;
   final String partition;
   final String userName;
@@ -32,6 +32,7 @@ class UserModel {
   final List<String>? conversations;
   final String? precense;
   final String? link;
+  final List<String>? saved;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);

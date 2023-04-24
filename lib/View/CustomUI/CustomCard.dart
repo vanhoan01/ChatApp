@@ -55,17 +55,21 @@ class CustomCard extends StatelessWidget {
               ),
             ),
             subtitle: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 chatModel.currentMessage == ""
                     ? Container()
-                    : Icon(Icons.done_all),
+                    : const Icon(Icons.done_all),
                 const SizedBox(
                   width: 3,
                 ),
-                Text(
-                  chatModel.currentMessage,
-                  style: const TextStyle(
-                    fontSize: 13,
+                Expanded(
+                  child: Text(
+                    chatModel.currentMessage,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ],

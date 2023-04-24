@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             const Text(
-              "Whatsapp sẽ gửi tin nhắn sms để xác minh số của bạn",
+              "SkyChat sẽ gửi tin nhắn sms để xác minh số của bạn",
               style: TextStyle(
                 fontSize: 13.5,
               ),

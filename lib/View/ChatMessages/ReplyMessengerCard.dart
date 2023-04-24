@@ -3,7 +3,10 @@
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ReactModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
+import 'package:chatapp/View/ChatMessages/Compoments/MessagesAudioView.dart';
+import 'package:chatapp/View/ChatMessages/Compoments/MessagesFileView.dart';
 import 'package:chatapp/View/ChatMessages/Compoments/MessagesImageView.dart';
+import 'package:chatapp/View/ChatMessages/Compoments/MessagesLocationView.dart';
 import 'package:chatapp/View/ChatMessages/Compoments/MessagesTextView.dart';
 import 'package:chatapp/View/ChatPage/Compoments/PopupMenuWidget.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
@@ -56,9 +59,11 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
 
   void getAvatar() async {
     String data = await userViewModel.getAvartar(widget.chatMM.author);
-    setState(() {
-      avt = data;
-    });
+    if (data != "") {
+      setState(() {
+        avt = data;
+      });
+    }
   }
 
   @override
@@ -114,11 +119,29 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
                                       chatReply != null ? chatReply!.text : "",
                                   reply: true,
                                 )
-                              : MessagesImageView(
-                                  path:
-                                      chatReply != null ? chatReply!.text : "",
-                                  reply: true,
-                                ),
+                              : widget.chatMM.type == "image"
+                                  ? MessagesImageView(
+                                      path: chatReply != null
+                                          ? chatReply!.text
+                                          : "",
+                                      reply: true,
+                                    )
+                                  : widget.chatMM.type == "file"
+                                      ? MessagesFileView(
+                                          name: widget.chatMM.text,
+                                          size: widget.chatMM.size ?? 0,
+                                          reply: true,
+                                        )
+                                      : widget.chatMM.type == "audio"
+                                          ? MessagesAudioView(
+                                              name: widget.chatMM.text,
+                                              size: widget.chatMM.size ?? 0,
+                                              reply: true,
+                                            )
+                                          : MessagesLocationView(
+                                              name: widget.chatMM.text,
+                                              reply: true,
+                                            ),
                         ),
                       )
                     : Container(),
@@ -151,10 +174,27 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
                               text: widget.chatMM.text,
                               reply: false,
                             )
-                          : MessagesImageView(
-                              path: widget.chatMM.text,
-                              reply: false,
-                            ),
+                          : widget.chatMM.type == "image"
+                              ? MessagesImageView(
+                                  path: widget.chatMM.text,
+                                  reply: false,
+                                )
+                              : widget.chatMM.type == "file"
+                                  ? MessagesFileView(
+                                      name: widget.chatMM.text,
+                                      size: widget.chatMM.size ?? 0,
+                                      reply: false,
+                                    )
+                                  : widget.chatMM.type == "audio"
+                                      ? MessagesAudioView(
+                                          name: widget.chatMM.text,
+                                          size: widget.chatMM.size ?? 0,
+                                          reply: false,
+                                        )
+                                      : MessagesLocationView(
+                                          name: widget.chatMM.text,
+                                          reply: false,
+                                        ),
                     ),
                   ),
                 ),

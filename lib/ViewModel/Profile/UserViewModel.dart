@@ -84,6 +84,17 @@ class UserViewModel {
     }
   }
 
+  Future<void> addSaved(String idmes) async {
+    try {
+      var responseUD = await networkHandler.get("/user/saved/add/$idmes");
+      // ignore: avoid_print
+      print('responsePD: $responseUD');
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+  }
+
   Future<String> getAvartar(String userName) async {
     String avt = "";
     try {

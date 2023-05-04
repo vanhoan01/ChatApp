@@ -24,7 +24,7 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void getUser() async {
-    UserModel data = await userViewModel.getFriendStatus();
+    UserModel data = await userViewModel.getUserModel();
     setState(() {
       userModel = data;
     });

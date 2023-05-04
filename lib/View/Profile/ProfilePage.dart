@@ -31,7 +31,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   void getUser() async {
-    UserModel data = await userViewModel.getFriendStatus();
+    UserModel data = await userViewModel.getUserModel();
     setState(() {
       userModel = data;
     });

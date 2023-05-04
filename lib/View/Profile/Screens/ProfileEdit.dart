@@ -30,7 +30,7 @@ class _ProfileEditState extends State<ProfileEdit> {
   }
 
   Future<void> getUser() async {
-    UserModel data = await userViewModel.getFriendStatus();
+    UserModel data = await userViewModel.getUserModel();
     setState(() {
       userModel = data;
     });

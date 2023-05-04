@@ -9,6 +9,7 @@ import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/View/ChatMessages/OwnMessageCard.dart';
 import 'package:chatapp/View/ChatMessages/ReplyMessengerCard.dart';
 import 'package:chatapp/View/ChatPage/Screens/LocationShareMap.dart';
+import 'package:chatapp/View/ChatPage/Screens/VideoCallScreen.dart';
 import 'package:chatapp/View/Screens/CameraScreen.dart';
 import 'package:chatapp/View/Screens/CameraViewPage.dart';
 import 'package:chatapp/View/Screens/Homescreen.dart';
@@ -40,7 +41,7 @@ class _IndividualPageState extends State<IndividualPage> {
   final TextEditingController _textEditingController = TextEditingController();
   bool sendButton = false;
   late List<ChatMessagesModel> messages = [];
-  final ScrollController _scrollController = ScrollController();
+  // final ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
   late XFile file;
   int popTime = 0;
@@ -80,12 +81,11 @@ class _IndividualPageState extends State<IndividualPage> {
 
   @override
   void initState() {
-    fetchData();
-
-    super.initState();
     _url = networkHandler.getURL();
-    // _urlImage = networkHandler.getURLImage();
-    connect();
+    fetchData();
+    super.initState();
+
+    // connect();
 
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -94,6 +94,11 @@ class _IndividualPageState extends State<IndividualPage> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -169,7 +174,17 @@ class _IndividualPageState extends State<IndividualPage> {
             ),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VideoCallScreen(
+                          channelName: sourceChat == null
+                              ? "skychat"
+                              : sourceChat!.userName),
+                    ),
+                  );
+                },
                 icon: const Icon(Icons.videocam),
               ),
               IconButton(
@@ -202,7 +217,7 @@ class _IndividualPageState extends State<IndividualPage> {
                     child: ListView.builder(
                       shrinkWrap: true,
                       reverse: true,
-                      controller: _scrollController,
+                      // controller: _scrollController,
                       itemCount: messages.length + 1,
                       itemBuilder: (context, index) {
                         if (index == messages.length) {
@@ -489,6 +504,7 @@ class _IndividualPageState extends State<IndividualPage> {
       messages = listChatMessages1!;
       relationship = relation.toString();
     });
+    connect();
   }
 
   Future<void> connect() async {
@@ -498,15 +514,15 @@ class _IndividualPageState extends State<IndividualPage> {
     });
     // ignore: await_only_futures
     await socket.connect();
-
+    socket.emit("signin", sourceChat!.userName);
     socket.onConnect((data) {
       // ignore: avoid_print
       print("Connected");
 
       socket.on("message", (msg) {
         // ignore: avoid_print
-        print(msg);
-        // if(msg['userId'] != widget.userId){}
+        print("nhận msg: $msg");
+
         setMessage(
           msg["author"],
           msg["partition"],
@@ -514,13 +530,15 @@ class _IndividualPageState extends State<IndividualPage> {
           msg["text"],
           msg["reply"],
         );
-        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+
+        // if (_scrollController.hasClients) {
+        //   _scrollController.animateTo(
+        //       _scrollController.position.maxScrollExtent ?? 0.5,
+        //       duration: const Duration(milliseconds: 300),
+        //       curve: Curves.easeOut);
+        // }
       });
     });
-    // ignore: avoid_print
-    socket.emit("signin", sourceChat!.userName);
-    print(socket.connected);
   }
 
   Future<void> sendMessage(String type, String text) async {
@@ -531,6 +549,7 @@ class _IndividualPageState extends State<IndividualPage> {
       "isGroup": widget.chatModel.isGroup.toString(),
       "type": type,
       "text": text,
+      'timestamp': DateTime.now().toString(),
       "reply": reply != null ? reply!['id'] : "",
     };
     var responseSend = await networkHandler.post1("/chatmessage/add", data);
@@ -538,17 +557,12 @@ class _IndividualPageState extends State<IndividualPage> {
     print(responseSend);
 
     //local
+
     setMessage(sourceChat!.userName, widget.chatModel.userName, type, text,
         reply != null ? reply!['id'] ?? "" : "");
 
     //socket
-    socket.emit("message", {
-      "text": text,
-      "sourceId": sourceChat!.userName,
-      "targetId": widget.chatModel.userName,
-      "type": type,
-      "reply": reply != null ? reply!['id'] : "",
-    });
+    socket.emit("message", data);
 
     setState(() {
       reply = null;
@@ -564,6 +578,7 @@ class _IndividualPageState extends State<IndividualPage> {
       "type": type,
       "text": fileName,
       "size": '$size',
+      'timestamp': DateTime.now().toString(),
       "reply": reply != null ? reply!['id'] : "",
     };
     var responseSend = await networkHandler.post1("/chatmessage/add", data);
@@ -582,21 +597,16 @@ class _IndividualPageState extends State<IndividualPage> {
       reply: reply != null ? reply!['id'] : "",
       // DateTime.now().toString().substring(11, 16),
     );
-    print("messages: $messages");
-    setState(() {
-      messages.insert(0, messageModel);
-    });
-    print("messages: $messages");
+
+    if (mounted) {
+      setState(() {
+        // messages.insert(0, messageModel);
+        messages = [messageModel, ...messages];
+      });
+    }
 
     //socket
-    socket.emit("message", {
-      "text": fileName,
-      "sourceId": sourceChat!.userName,
-      "targetId": widget.chatModel.userName,
-      "type": type,
-      "size": size,
-      "reply": reply != null ? reply!['id'] : "",
-    });
+    socket.emit("message", data);
 
     setState(() {
       reply = null;
@@ -634,6 +644,7 @@ class _IndividualPageState extends State<IndividualPage> {
         "isGroup": widget.chatModel.isGroup.toString(),
         "type": "image",
         "text": data['path'],
+        'timestamp': DateTime.now().toString(),
         "reply": reply != null ? reply!['id'] ?? "" : "",
       };
       await networkHandler.post("/chatmessage/add", dataMap);
@@ -664,11 +675,16 @@ class _IndividualPageState extends State<IndividualPage> {
       reply: reply,
       // DateTime.now().toString().substring(11, 16),
     );
-    print("messages: $messages");
-    setState(() {
-      messages.insert(0, messageModel);
-    });
-    print("messages: $messages");
+    // print("messages: $messages");
+
+    if (mounted) {
+      setState(() {
+        // messages.insert(0, messageModel);
+        messages = [messageModel, ...messages];
+      });
+    }
+
+    // print("messages: $messages");
   }
 
   Future<void> setRelationship(String userRela, String chatterRela) async {

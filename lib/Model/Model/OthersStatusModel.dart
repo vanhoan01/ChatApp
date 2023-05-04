@@ -8,11 +8,11 @@ part 'OthersStatusModel.g.dart';
 class OthersStatusModel {
   OthersStatusModel(
       {required this.displayName,
-      required this.lastSeenAt,
+      this.lastSeenAt,
       required this.avatarImage,
       required this.isGroup});
   final String displayName;
-  final DateTime lastSeenAt;
+  final DateTime? lastSeenAt;
   final String avatarImage;
   final bool isGroup;
 

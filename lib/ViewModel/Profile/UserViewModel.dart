@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/ViewModel/Image/ImageViewModel.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -10,7 +11,7 @@ class UserViewModel {
   NetworkHandler networkHandler = NetworkHandler();
   final storage = const FlutterSecureStorage();
 
-  Future<UserModel> getFriendStatus() async {
+  Future<UserModel> getUserModel() async {
     UserModel? userModel;
     try {
       var responsePD = await networkHandler.get("/user/getData");

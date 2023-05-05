@@ -179,9 +179,9 @@ class _IndividualPageState extends State<IndividualPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => VideoCallScreen(
-                          channelName: sourceChat == null
-                              ? "skychat"
-                              : sourceChat!.userName),
+                        caller: sourceChat!.userName,
+                        creceiver: widget.chatModel.userName,
+                      ),
                     ),
                   );
                 },

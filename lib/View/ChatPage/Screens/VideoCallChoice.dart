@@ -118,15 +118,15 @@ class _VideoCallChoiceState extends State<VideoCallChoice> {
       await _handleCameraAndMic(Permission.camera);
       await _handleCameraAndMic(Permission.microphone);
       // ignore: use_build_context_synchronously
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VideoCallScreen(
-            channelName: _channelController.text,
-            // role: _role,
-          ),
-        ),
-      );
+      // await Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => VideoCallScreen(
+      //       channelName: _channelController.text,
+      //       // role: _role,
+      //     ),
+      //   ),
+      // );
     }
   }
 

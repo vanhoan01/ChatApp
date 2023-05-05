@@ -7,17 +7,15 @@ import 'package:chatapp/Data/Services/network_handler.dart';
 class CallViewModel {
   NetworkHandler networkHandler = NetworkHandler();
 
-  Future<String> gertctoken(bool isPublisher, String channel) async {
+  Future<String> gertctoken(String channelName, String account) async {
     String token = "";
     var body = {
-      "isPublisher": isPublisher,
-      "channel": channel,
+      "channelName": channelName,
+      "account": account,
     };
     try {
       var responsePD = await networkHandler.post1("/call/rtctoken", body);
-      var result = json.decode(responsePD.body);
-      // ignore: avoid_print
-      token = result['token'];
+      token = json.decode(responsePD.body);
     } catch (e) {
       // ignore: avoid_print
       print(e);

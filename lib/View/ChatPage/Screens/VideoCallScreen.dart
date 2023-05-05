@@ -15,8 +15,10 @@ import '../Utils/settings.dart';
 //https://www.thegioididong.com/game-app/cach-goi-video-tren-facebook-messenger-bang-dien-1262983
 
 class VideoCallScreen extends StatefulWidget {
-  final String channelName;
-  const VideoCallScreen({Key? key, required this.channelName})
+  final String caller;
+  final String creceiver;
+  const VideoCallScreen(
+      {Key? key, required this.caller, required this.creceiver})
       : super(key: key);
 
   @override
@@ -31,6 +33,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   late RtcEngine _engine;
   // String? _token;
   CallViewModel callViewModel = CallViewModel();
+  String channelName = "";
+  Widget? viewUser;
 
   @override
   void dispose() {
@@ -44,18 +48,21 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   @override
   void initState() {
+    channelName = widget.caller.compareTo(widget.creceiver) > 0
+        ? widget.caller + widget.creceiver
+        : widget.creceiver + widget.caller;
+    initialize();
     super.initState();
     // initialize agora sdk
-    initialize();
   }
 
   Future<String> getToken() async {
-    String data = await callViewModel.gertctoken(true, widget.channelName);
-    print("token: $data");
+    String tokendt = await callViewModel.gertctoken(channelName, widget.caller);
+    print("token: $tokendt");
     // setState(() {
     //   _token = data;
     // });
-    return data;
+    return tokendt;
   }
 
   Future<void> initialize() async {
@@ -78,7 +85,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     configuration.dimensions = const VideoDimensions(height: 1920, width: 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
     print("token join: $token");
-    await _engine.joinChannel(token, widget.channelName, null, 0);
+    print("widget.channelName: ${widget.caller}");
+    await _engine.joinChannelWithUserAccount(token, channelName, widget.caller);
+    setState(() {
+      viewUser = Center(
+          child: RtcLocalView.SurfaceView(
+        channelId: channelName,
+      ));
+    });
   }
 
   Future<void> _initAgoraRtcEngine() async {
@@ -124,56 +138,21 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     }));
   }
 
-  List<Widget> _getRenderViews() {
-    final List<StatefulWidget> list = [];
-    list.add(const RtcLocalView.SurfaceView());
-    for (var uid in _users) {
-      list.add(RtcRemoteView.SurfaceView(
-        uid: uid,
-        channelId: widget.channelName,
-      ));
-    }
-    return list;
-  }
-
-  Widget _videoView(view) {
-    return Expanded(child: Container(child: view));
-  }
-
-  Widget _expandedVideoRow(List<Widget> views) {
-    final wrappedViews = views.map<Widget>(_videoView).toList();
-    return Expanded(
-      child: Row(
-        children: wrappedViews,
-      ),
-    );
-  }
-
-  Widget _viewRows() {
-    final views = _getRenderViews();
-
-    if (views.isNotEmpty) {
-      _videoView(views[0]);
-    }
-
-    return Container();
-  }
-
-  Widget _viewRows1() {
-    final views = _getRenderViews();
-
-    if (views.length > 1) {
-      Positioned(
+  Widget _viewSubscriber() {
+    if (_users.isNotEmpty) {
+      return Positioned(
         top: 10,
         right: 10,
-        child: Container(
+        child: SizedBox(
           height: 250,
           width: 150,
-          child: views[1],
+          child: RtcRemoteView.SurfaceView(
+            uid: _users[0],
+            channelId: channelName,
+          ),
         ),
       );
     }
-
     return Container();
   }
 
@@ -316,14 +295,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ],
       ),
       backgroundColor: Colors.black,
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            _viewRows(),
-            _panel(),
-            _toolbar(),
-          ],
-        ),
+      body: Stack(
+        children: <Widget>[
+          viewUser ?? Container(),
+          _viewSubscriber(),
+          _panel(),
+          _toolbar(),
+        ],
       ),
     );
   }

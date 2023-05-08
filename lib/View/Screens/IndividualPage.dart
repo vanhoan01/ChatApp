@@ -55,6 +55,8 @@ class _IndividualPageState extends State<IndividualPage> {
   FilePickerResult? result;
   List<File>? files;
 
+  // final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   void setReply(String id, String userReply, String textReply) {
     setState(() {
       reply = {
@@ -103,360 +105,367 @@ class _IndividualPageState extends State<IndividualPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Image.asset(
-          'assets/whatsapp_Back.png',
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          fit: BoxFit.cover,
-        ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            leadingWidth: 70,
-            titleSpacing: 0,
-            leading: InkWell(
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Homescreen()),
-                    (route) => false);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.arrow_back),
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: widget.chatModel.avatarImage.isNotEmpty
-                        ? NetworkImage(
-                            "$_url/uploads/${widget.chatModel.avatarImage}",
-                          )
-                        : null,
-                    backgroundColor: Colors.blueGrey,
-                    child: widget.chatModel.avatarImage.isEmpty
-                        ? SvgPicture.asset(
-                            widget.chatModel.isGroup
-                                ? 'assets/groups.svg'
-                                : 'assets/person.svg',
-                            color: Colors.white,
-                            height: 37,
-                            width: 37,
-                          )
-                        : Container(),
-                  )
-                ],
-              ),
-            ),
-            title: InkWell(
-              onTap: () {},
-              child: Container(
-                margin: const EdgeInsets.all(6),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      body: Stack(
+        children: [
+          Image.asset(
+            'assets/whatsapp_Back.png',
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+          ),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              leadingWidth: 70,
+              titleSpacing: 0,
+              leading: InkWell(
+                onTap: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const Homescreen()),
+                      (route) => false);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      widget.chatModel.displayName,
-                      style: const TextStyle(
-                          fontSize: 18.5, fontWeight: FontWeight.bold),
+                    const Icon(Icons.arrow_back),
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: widget.chatModel.avatarImage.isNotEmpty
+                          ? NetworkImage(
+                              "$_url/uploads/${widget.chatModel.avatarImage}",
+                            )
+                          : null,
+                      backgroundColor: Colors.blueGrey,
+                      child: widget.chatModel.avatarImage.isEmpty
+                          ? SvgPicture.asset(
+                              widget.chatModel.isGroup
+                                  ? 'assets/groups.svg'
+                                  : 'assets/person.svg',
+                              color: Colors.white,
+                              height: 37,
+                              width: 37,
+                            )
+                          : Container(),
+                    )
+                  ],
+                ),
+              ),
+              title: InkWell(
+                onTap: () {},
+                child: Container(
+                  margin: const EdgeInsets.all(6),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.chatModel.displayName,
+                        style: const TextStyle(
+                            fontSize: 18.5, fontWeight: FontWeight.bold),
+                      ),
+                      const Text(
+                        'Last seen today at 12:06',
+                        style: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VideoCallScreen(
+                          caller: sourceChat!.userName,
+                          creceiver: widget.chatModel.userName,
+                          callStatus: true,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.videocam),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.call),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InformationUser(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.info),
+                ),
+              ],
+            ),
+            body: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.height,
+              child: WillPopScope(
+                child: Column(
+                  children: [
+                    relationship == "Bạn bè" || widget.chatModel.isGroup == true
+                        ? Container()
+                        : ketBan(),
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        reverse: true,
+                        // controller: _scrollController,
+                        itemCount: messages.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == messages.length) {
+                            return Container(
+                              height: 70,
+                            );
+                          }
+                          if (messages[index].author == sourceChat!.userName) {
+                            return OwnMessageCard(
+                              chatMM: messages[index],
+                              timeAfter: index < messages.length - 1
+                                  ? messages[index + 1].timestamp
+                                  : DateTime.parse('2020-01-01'),
+                              userId: sourceChat != null
+                                  ? sourceChat!.id ?? ""
+                                  : "",
+                              setReply: setReply,
+                            );
+                          } else {
+                            return ReplyMessengerCard(
+                                userId: sourceChat != null
+                                    ? sourceChat!.id ?? ""
+                                    : "",
+                                chatMM: messages[index],
+                                timeAfter: index < messages.length - 1
+                                    ? messages[index + 1].timestamp
+                                    : DateTime.parse('2010-01-01'),
+                                setReply: setReply);
+                          }
+                        },
+                      ),
                     ),
-                    const Text(
-                      'Last seen today at 12:06',
-                      style: TextStyle(
-                        fontSize: 13,
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          reply != null
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border(
+                                      top: BorderSide(
+                                          width: 1.0,
+                                          color: Colors.grey.shade300),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Đang trả lời ${reply!['userReply']}",
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 2,
+                                            ),
+                                            Text(
+                                              reply!['textReply'] ?? "",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.grey.shade700),
+                                              maxLines: 1,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              reply = null;
+                                            });
+                                          },
+                                          icon: const Icon(Icons.close))
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                          SizedBox(
+                            height: 70,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width -
+                                          60,
+                                      child: Card(
+                                        // ignore: prefer_const_constructors
+                                        margin: EdgeInsets.only(
+                                            left: 2, right: 2, bottom: 8),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(25)),
+                                        child: TextFormField(
+                                          controller: _textEditingController,
+                                          focusNode: focusNode,
+                                          textAlignVertical:
+                                              TextAlignVertical.center,
+                                          keyboardType: TextInputType.multiline,
+                                          maxLength: 100,
+                                          minLines: 1,
+                                          maxLines: 3,
+                                          onChanged: (value) {
+                                            if (value.isNotEmpty) {
+                                              setState(() {
+                                                sendButton = true;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                sendButton = false;
+                                              });
+                                            }
+                                          },
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Type of message',
+                                            counterText: "",
+                                            contentPadding:
+                                                const EdgeInsets.all(5),
+                                            prefixIcon: IconButton(
+                                              icon: const Icon(
+                                                  Icons.emoji_emotions),
+                                              onPressed: () {
+                                                focusNode.unfocus();
+                                                focusNode.canRequestFocus =
+                                                    false;
+                                                setState(() {
+                                                  show = !show;
+                                                });
+                                              },
+                                            ),
+                                            suffixIcon: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    showModalBottomSheet(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        context: context,
+                                                        builder: (builder) =>
+                                                            bottomsheet());
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.attach_file),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      popTime = 2;
+                                                    });
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (builder) =>
+                                                            CameraScreen(
+                                                          onImageSend:
+                                                              onImageSend,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.camera_alt),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: 8, right: 5, left: 2),
+                                      child: CircleAvatar(
+                                        radius: 25,
+                                        backgroundColor:
+                                            const Color(0xFF128C7E),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            if (sendButton) {
+                                              // _scrollController.animateTo(
+                                              //     _scrollController
+                                              //         .position.maxScrollExtent,
+                                              //     duration: const Duration(
+                                              //         milliseconds: 300),
+                                              //     curve: Curves.easeOut);
+                                              sendMessage(
+                                                "text",
+                                                _textEditingController.text,
+                                              );
+                                              _textEditingController.clear();
+                                              setState(() {
+                                                sendButton = false;
+                                              });
+                                            }
+                                          },
+                                          icon: Icon(
+                                            sendButton ? Icons.send : Icons.mic,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                show ? emojiSelect() : Container(),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
+                onWillPop: () {
+                  if (show) {
+                    setState(() {
+                      show = false;
+                    });
+                  } else {
+                    Navigator.pop(context);
+                  }
+                  return Future.value(false);
+                },
               ),
             ),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VideoCallScreen(
-                        caller: sourceChat!.userName,
-                        creceiver: widget.chatModel.userName,
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.videocam),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.call),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const InformationUser(),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.info),
-              ),
-            ],
           ),
-          body: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.height,
-            child: WillPopScope(
-              child: Column(
-                children: [
-                  relationship == "Bạn bè" || widget.chatModel.isGroup == true
-                      ? Container()
-                      : ketBan(),
-                  Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      reverse: true,
-                      // controller: _scrollController,
-                      itemCount: messages.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == messages.length) {
-                          return Container(
-                            height: 70,
-                          );
-                        }
-                        if (messages[index].author == sourceChat!.userName) {
-                          return OwnMessageCard(
-                            chatMM: messages[index],
-                            timeAfter: index < messages.length - 1
-                                ? messages[index + 1].timestamp
-                                : DateTime.parse('2020-01-01'),
-                            userId:
-                                sourceChat != null ? sourceChat!.id ?? "" : "",
-                            setReply: setReply,
-                          );
-                        } else {
-                          return ReplyMessengerCard(
-                              userId: sourceChat != null
-                                  ? sourceChat!.id ?? ""
-                                  : "",
-                              chatMM: messages[index],
-                              timeAfter: index < messages.length - 1
-                                  ? messages[index + 1].timestamp
-                                  : DateTime.parse('2010-01-01'),
-                              setReply: setReply);
-                        }
-                      },
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        reply != null
-                            ? Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border(
-                                    top: BorderSide(
-                                        width: 1.0,
-                                        color: Colors.grey.shade300),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Đang trả lời ${reply!['userReply']}",
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 2,
-                                          ),
-                                          Text(
-                                            reply!['textReply'] ?? "",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.grey.shade700),
-                                            maxLines: 1,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            reply = null;
-                                          });
-                                        },
-                                        icon: const Icon(Icons.close))
-                                  ],
-                                ),
-                              )
-                            : Container(),
-                        SizedBox(
-                          height: 70,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width - 60,
-                                    child: Card(
-                                      // ignore: prefer_const_constructors
-                                      margin: EdgeInsets.only(
-                                          left: 2, right: 2, bottom: 8),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(25)),
-                                      child: TextFormField(
-                                        controller: _textEditingController,
-                                        focusNode: focusNode,
-                                        textAlignVertical:
-                                            TextAlignVertical.center,
-                                        keyboardType: TextInputType.multiline,
-                                        maxLength: 100,
-                                        minLines: 1,
-                                        maxLines: 3,
-                                        onChanged: (value) {
-                                          if (value.isNotEmpty) {
-                                            setState(() {
-                                              sendButton = true;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              sendButton = false;
-                                            });
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'Type of message',
-                                          counterText: "",
-                                          contentPadding:
-                                              const EdgeInsets.all(5),
-                                          prefixIcon: IconButton(
-                                            icon: const Icon(
-                                                Icons.emoji_emotions),
-                                            onPressed: () {
-                                              focusNode.unfocus();
-                                              focusNode.canRequestFocus = false;
-                                              setState(() {
-                                                show = !show;
-                                              });
-                                            },
-                                          ),
-                                          suffixIcon: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  showModalBottomSheet(
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      context: context,
-                                                      builder: (builder) =>
-                                                          bottomsheet());
-                                                },
-                                                icon: const Icon(
-                                                    Icons.attach_file),
-                                              ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    popTime = 2;
-                                                  });
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (builder) =>
-                                                          CameraScreen(
-                                                        onImageSend:
-                                                            onImageSend,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                                icon: const Icon(
-                                                    Icons.camera_alt),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 8, right: 5, left: 2),
-                                    child: CircleAvatar(
-                                      radius: 25,
-                                      backgroundColor: const Color(0xFF128C7E),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          if (sendButton) {
-                                            // _scrollController.animateTo(
-                                            //     _scrollController
-                                            //         .position.maxScrollExtent,
-                                            //     duration: const Duration(
-                                            //         milliseconds: 300),
-                                            //     curve: Curves.easeOut);
-                                            sendMessage(
-                                              "text",
-                                              _textEditingController.text,
-                                            );
-                                            _textEditingController.clear();
-                                            setState(() {
-                                              sendButton = false;
-                                            });
-                                          }
-                                        },
-                                        icon: Icon(
-                                          sendButton ? Icons.send : Icons.mic,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              show ? emojiSelect() : Container(),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              onWillPop: () {
-                if (show) {
-                  setState(() {
-                    show = false;
-                  });
-                } else {
-                  Navigator.pop(context);
-                }
-                return Future.value(false);
-              },
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -513,11 +522,17 @@ class _IndividualPageState extends State<IndividualPage> {
       "autoConnect": false,
     });
     // ignore: await_only_futures
-    await socket.connect();
-    socket.emit("signin", sourceChat!.userName);
+
+    if (socket.active == false) {
+      // ignore: avoid_print
+      print("Connecting");
+      // ignore: await_only_futures
+      // await socket.connect();
+      // socket.emit("signin", sourceChat!.userName);
+    }
+    // socket.emit("signin", sourceChat!.userName);
     socket.onConnect((data) {
       // ignore: avoid_print
-      print("Connected");
 
       socket.on("message", (msg) {
         // ignore: avoid_print
@@ -538,6 +553,21 @@ class _IndividualPageState extends State<IndividualPage> {
         //       curve: Curves.easeOut);
         // }
       });
+
+      // socket.on("calling", (msg) {
+      //   // ignore: avoid_print
+      //   print("Nhận cuộc gọi: $msg");
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //       builder: (context) => VideoCallScreen(
+      //         caller: sourceChat!.userName,
+      //         creceiver: widget.chatModel.userName,
+      //         callStatus: false,
+      //       ),
+      //     ),
+      //   );
+      // });
     });
   }
 

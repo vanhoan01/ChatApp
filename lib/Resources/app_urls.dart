@@ -1,5 +1,5 @@
 class AppUrl {
-  static String baseUrl = "http://172.16.1.191:60000";
+  static String baseUrl = "http://10.10.1.100:60000";
   static String imageUrl = "$baseUrl/uploads/";
   static String fileUrl = "$baseUrl/uploads/files/";
   static String audioUrl = "$baseUrl/uploads/audios/";

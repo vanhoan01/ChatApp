@@ -7,19 +7,26 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 // ignore: library_prefixes
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
+import 'package:chatapp/Resources/app_urls.dart';
 import 'package:chatapp/ViewModel/CallViewModel.dart';
 import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../Utils/settings.dart';
 
 //https://www.thegioididong.com/game-app/cach-goi-video-tren-facebook-messenger-bang-dien-1262983
+//https://navoki.com/how-video-call-works-in-flutter-explained/
 
 class VideoCallScreen extends StatefulWidget {
   final String caller;
   final String creceiver;
-  const VideoCallScreen(
-      {Key? key, required this.caller, required this.creceiver})
-      : super(key: key);
+  final bool callStatus;
+  const VideoCallScreen({
+    Key? key,
+    required this.caller,
+    required this.creceiver,
+    required this.callStatus,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -35,6 +42,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   CallViewModel callViewModel = CallViewModel();
   String channelName = "";
   Widget? viewUser;
+  late IO.Socket socket;
 
   @override
   void dispose() {
@@ -52,6 +60,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ? widget.caller + widget.creceiver
         : widget.creceiver + widget.caller;
     initialize();
+    connect();
     super.initState();
     // initialize agora sdk
   }
@@ -304,5 +313,33 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> connect() async {
+    socket = IO.io(AppUrl.baseUrl, <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
+    // ignore: await_only_futures
+
+    // if (socket.active == false) {
+    //   // ignore: avoid_print
+    //   print("Connecting");
+    //   // ignore: await_only_futures
+    //   await socket.connect();
+    // }
+    // await socket.connect();
+    if (widget.callStatus) {
+      print("emit calling");
+      socket.emit("calling", [widget.caller, widget.creceiver]);
+    }
+
+    // socket.onConnect((data) {
+    //   // ignore: avoid_print
+    //   socket.on("calling", (msg) {
+    //     // ignore: avoid_print
+    //     print("Đối phương đã nhận cuộc gọi: $msg");
+    //   });
+    // });
   }
 }

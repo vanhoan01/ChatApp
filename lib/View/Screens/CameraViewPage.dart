@@ -90,10 +90,9 @@ class CameraViewPage extends StatelessWidget {
                     ),
                     suffixIcon: InkWell(
                       onTap: () {
-                        onImageSend(
-                          path,
-                          _editingController.text.trim(),
-                        );
+                        onImageSend(path
+                            // _editingController.text.trim(),
+                            );
                       },
                       child: CircleAvatar(
                         radius: 27,

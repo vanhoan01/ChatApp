@@ -28,7 +28,7 @@ class _HomescreenState extends State<Homescreen>
 
   @override
   void initState() {
-    connectSocket();
+    // connectSocket();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 4, vsync: this, initialIndex: 0);

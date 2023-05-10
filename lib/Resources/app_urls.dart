@@ -1,5 +1,7 @@
 class AppUrl {
-  static String baseUrl = "http://10.10.1.100:60000";
+  static String baseUrl = "https://chatserver-production.up.railway.app";
+  //https://chatserver-production.up.railway.app
+  //http://10.10.1.154:60000
   static String imageUrl = "$baseUrl/uploads/";
   static String fileUrl = "$baseUrl/uploads/files/";
   static String audioUrl = "$baseUrl/uploads/audios/";

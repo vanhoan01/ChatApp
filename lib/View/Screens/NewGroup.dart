@@ -6,8 +6,8 @@ import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/ChatterModel.dart';
 import 'package:chatapp/Model/Model/ConversationModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
-import 'package:chatapp/View/CustomUI/AvtarCardItem.dart';
-import 'package:chatapp/View/Screens/IndividualPage.dart';
+import 'package:chatapp/View/Components/CustomUI/AvtarCardItem.dart';
+import 'package:chatapp/View/Screens/Conversation/ConversationScreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -124,7 +124,7 @@ class _NewGroupState extends State<NewGroup> {
           return null;
         },
         decoration: InputDecoration(
-          hintStyle: TextStyle(color: Colors.teal),
+          hintStyle: const TextStyle(color: Colors.teal),
           hintText: "Tiêu đề nhóm",
           counterText: "",
           prefixIcon: Padding(
@@ -195,14 +195,14 @@ class _NewGroupState extends State<NewGroup> {
             displayName: conversationModel.displayName,
             avatarImage: conversationModel.avatarImage,
             isGroup: true,
-            timestamp: '',
+            timestamp: DateTime.now(),
             currentMessage: '');
 
         // ignore: use_build_context_synchronously
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-                builder: (context) => IndividualPage(
+                builder: (context) => ConversationScreen(
                       chatModel: chatModel,
                     )),
             (route) => false);

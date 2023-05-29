@@ -1,5 +1,5 @@
 import 'package:chatapp/Model/Model/ChatModel.dart';
-import 'package:chatapp/View/CustomUI/SearchItem.dart';
+import 'package:chatapp/View/Components/CustomUI/SearchItem.dart';
 import 'package:flutter/material.dart';
 
 class SearchResult extends StatefulWidget {
@@ -27,7 +27,7 @@ class _SearchResultState extends State<SearchResult> {
           displayName: "Văn Hoàn $i",
           avatarImage: "",
           isGroup: false,
-          timestamp: '03:00',
+          timestamp: DateTime.now(),
           currentMessage: 'currentMessage');
       chatModelChatter.add(chatModel);
     }

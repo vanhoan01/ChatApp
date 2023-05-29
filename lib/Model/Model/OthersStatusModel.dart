@@ -10,11 +10,13 @@ class OthersStatusModel {
       {required this.displayName,
       this.lastSeenAt,
       required this.avatarImage,
-      required this.isGroup});
+      required this.isGroup,
+      required this.precense});
   final String displayName;
   final DateTime? lastSeenAt;
   final String avatarImage;
   final bool isGroup;
+  final String precense;
 
   factory OthersStatusModel.fromJson(Map<String, dynamic> json) =>
       _$OthersStatusModelFromJson(json);

@@ -2,57 +2,13 @@
 
 import 'package:chatapp/Model/List/ListChatterModel.dart';
 import 'package:chatapp/Model/Model/ChatModel.dart';
-import 'package:chatapp/View/CustomUI/SearchItem.dart';
+import 'package:chatapp/View/Components/CustomUI/SearchItem.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends SearchDelegate {
   NetworkHandler networkHandler = NetworkHandler();
-  // ListChatModel listChatModel = ListChatModel();
-  List<ChatModel> chatmodels = [
-    // ChatModel(
-    //     userName: 'hoan2',
-    //     displayName: 'Võ Đức Huy',
-    //     avatarImage: '',
-    //     isGroup: false,
-    //     timestamp: '03:00',
-    //     currentMessage: 'currentMessage'),
-    // ChatModel(
-    //     userName: 'hoan2',
-    //     displayName: 'Lưu Bùi Cẩm Ly',
-    //     avatarImage: '',
-    //     isGroup: false,
-    //     timestamp: '03:00',
-    //     currentMessage: 'currentMessage'),
-    // ChatModel(
-    //     userName: 'hoan2',
-    //     displayName: 'Ngô Ngọc Kim Ngân',
-    //     avatarImage: '',
-    //     isGroup: false,
-    //     timestamp: '03:00',
-    //     currentMessage: 'currentMessage'),
-    // ChatModel(
-    //     userName: 'hoan2',
-    //     displayName: 'Nguyễn Thị Hồng Chúc',
-    //     avatarImage: '',
-    //     isGroup: false,
-    //     timestamp: '03:00',
-    //     currentMessage: 'currentMessage'),
-    // ChatModel(
-    //     userName: 'hoan2',
-    //     displayName: 'Lý Diệu Tân',
-    //     avatarImage: '',
-    //     isGroup: false,
-    //     timestamp: '03:00',
-    //     currentMessage: 'currentMessage'),
-    // ChatModel(
-    //     userName: 'hoan2',
-    //     displayName: 'Nguyễn Minh Trọng',
-    //     avatarImage: '',
-    //     isGroup: false,
-    //     timestamp: '03:00',
-    //     currentMessage: 'currentMessage'),
-  ];
+  List<ChatModel> chatmodels = [];
 
   Future fetchData(String query) async {
     var responseChatters = await networkHandler.get("/chatter/search/$query");
@@ -68,7 +24,7 @@ class SearchScreen extends SearchDelegate {
             displayName: listChatters.elementAt(i).displayName,
             avatarImage: listChatters.elementAt(i).avatarImage.toString(),
             isGroup: false,
-            timestamp: '03:00',
+            timestamp: DateTime.now(),
             currentMessage: 'currentMessage');
         chatModelChatter.add(chatModel);
       }

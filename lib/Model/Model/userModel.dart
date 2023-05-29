@@ -2,7 +2,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-part "userModel.g.dart";
+part 'userModel.g.dart';
 
 @JsonSerializable()
 class UserModel {

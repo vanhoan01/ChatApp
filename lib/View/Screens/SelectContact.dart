@@ -2,8 +2,8 @@
 
 import 'package:chatapp/Model/List/ListChatterModel.dart';
 import 'package:chatapp/Model/Model/ChatterModel.dart';
-import 'package:chatapp/View/CustomUI/ButtonCard.dart';
-import 'package:chatapp/View/CustomUI/ContactCard.dart';
+import 'package:chatapp/View/Components/CustomUI/ButtonCard.dart';
+import 'package:chatapp/View/Components/CustomUI/ContactCard.dart';
 import 'package:chatapp/View/Screens/CreateGroup.dart';
 import 'package:chatapp/View/Screens/SearchScreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
@@ -61,15 +61,13 @@ class _SelectContactState extends State<SelectContact> {
             Text(
               'Chọn liên hệ',
               style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
             Text(
               '265 liên hệ',
-              style: TextStyle(
-                fontSize: 13,
-              ),
+              style: TextStyle(fontSize: 13, color: Colors.black),
             ),
           ],
         ),
@@ -81,13 +79,11 @@ class _SelectContactState extends State<SelectContact> {
                 delegate: SearchScreen(),
               );
             },
-            icon: const Icon(
-              Icons.search,
-              size: 26,
-            ),
+            icon: const Icon(Icons.search, size: 26, color: Colors.black),
           ),
           PopupMenuButton<String>(
             offset: const Offset(-20, 45),
+            color: Colors.black,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(5.0),
@@ -130,7 +126,7 @@ class _SelectContactState extends State<SelectContact> {
                     MaterialPageRoute(builder: (builder) => CreateGroup()));
                 // print('hihi');
               },
-              child: ButtonCard(icon: Icons.group, name: 'Nhóm mới'),
+              child: const ButtonCard(icon: Icons.group, name: 'Nhóm mới'),
             );
           } else if (index == 1) {
             return InkWell(
@@ -140,7 +136,8 @@ class _SelectContactState extends State<SelectContact> {
                     delegate: SearchScreen(),
                   );
                 },
-                child: ButtonCard(icon: Icons.person, name: 'Liên hệ mới'));
+                child:
+                    const ButtonCard(icon: Icons.person, name: 'Liên hệ mới'));
           }
           return ContactCard(contact: contacts[index - 2]);
         },

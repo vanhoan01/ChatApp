@@ -1,85 +1,22 @@
 import 'dart:async';
-
 import 'package:camera/camera.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
-// import 'package:chatapp/View/CallkitIncoming/AppRoute.dart';
-import 'package:chatapp/View/CallkitIncoming/NavigationService.dart';
-import 'package:chatapp/View/ChatPage/Screens/VideoCallScreen.dart';
-import 'package:chatapp/View/Pages/LoadingPage.dart';
-import 'package:chatapp/View/Screens/CameraScreen.dart';
-import 'package:chatapp/View/Screens/Homescreen.dart';
-import 'package:chatapp/View/Screens/LoginScreen.dart';
-import 'package:chatapp/ViewModel/Profile/UserViewModel.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:chatapp/View/Navigation/NavigationService.dart';
+import 'package:chatapp/View/Screens/Call/VideoCallScreen.dart';
+import 'package:chatapp/View/Screens/LoadingPage.dart';
+import 'package:chatapp/View/Screens/Camera/CameraScreen.dart';
+import 'package:chatapp/View/Screens/Pages/Homescreen.dart';
+import 'package:chatapp/View/Screens/Login/LoginScreen.dart';
+import 'package:chatapp/ViewModel/UserViewModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:flutter_callkit_incoming/entities/entities.dart';
-// import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:uuid/uuid.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-
-//https://github.com/hiennguyen92/flutter_callkit_incoming/blob/master/example/lib/main.dart
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   print("Handling a background message: ${message.messageId}");
-//   showCallkitIncoming(Uuid().v4());
-// }
-
-// Future<void> showCallkitIncoming(String uuid) async {
-//   final params = CallKitParams(
-//     id: uuid,
-//     nameCaller: 'Hien Nguyen',
-//     appName: 'Callkit',
-//     avatar: 'https://i.pravatar.cc/100',
-//     handle: '0123456789',
-//     type: 0,
-//     duration: 30000,
-//     textAccept: 'Accept',
-//     textDecline: 'Decline',
-//     textMissedCall: 'Missed call',
-//     textCallback: 'Call back',
-//     extra: <String, dynamic>{'userId': '1a2b3c4d'},
-//     headers: <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
-//     android: AndroidParams(
-//       isCustomNotification: true,
-//       isShowLogo: false,
-//       isShowCallback: true,
-//       isShowMissedCallNotification: true,
-//       ringtonePath: 'system_ringtone_default',
-//       backgroundColor: '#0955fa',
-//       backgroundUrl: 'assets/bg.png',
-//       actionColor: '#4CAF50',
-//     ),
-//     ios: IOSParams(
-//       // iconName: 'CallKitLogo',
-//       handleType: '',
-//       supportsVideo: true,
-//       maximumCallGroups: 2,
-//       maximumCallsPerCallGroup: 1,
-//       audioSessionMode: 'default',
-//       audioSessionActive: true,
-//       audioSessionPreferredSampleRate: 44100.0,
-//       audioSessionPreferredIOBufferDuration: 0.005,
-//       supportsDTMF: true,
-//       supportsHolding: true,
-//       supportsGrouping: false,
-//       supportsUngrouping: false,
-//       ringtonePath: 'system_ringtone_default',
-//     ),
-//   );
-//   await FlutterCallkitIncoming.showCallkitIncoming(params);
-// }
-
-///
-///
-///Notification
-///
-///
 
 int id = 1;
 
@@ -140,29 +77,19 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
   }
 }
 
-///
-///
-///Notification
-///
-///
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
-  // await Firebase.initializeApp();
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // await _configureLocalTimeZone();
+  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
 
   final NotificationAppLaunchDetails? notificationAppLaunchDetails = !kIsWeb &&
           defaultTargetPlatform == TargetPlatform.android
       ? null
       : await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-  // String initialRoute = HomePage.routeName;
+
   if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
     selectedNotificationPayload =
         notificationAppLaunchDetails!.notificationResponse?.payload;
-    // initialRoute = SecondPage.routeName;
   }
 
   const AndroidInitializationSettings initializationSettingsAndroid =
@@ -213,8 +140,6 @@ Future<void> main() async {
     )
   ];
 
-  /// Note: permissions aren't requested here just to demonstrate that can be
-  /// done later
   final DarwinInitializationSettings initializationSettingsDarwin =
       DarwinInitializationSettings(
     requestAlertPermission: false,
@@ -233,17 +158,20 @@ Future<void> main() async {
     },
     notificationCategories: darwinNotificationCategories,
   );
-  final LinuxInitializationSettings initializationSettingsLinux =
+
+  const LinuxInitializationSettings initializationSettingsLinux =
       LinuxInitializationSettings(
     defaultActionName: 'Open notification',
     // defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
   );
+
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
     iOS: initializationSettingsDarwin,
     macOS: initializationSettingsDarwin,
     linux: initializationSettingsLinux,
   );
+
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse:
@@ -261,6 +189,7 @@ Future<void> main() async {
     },
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
   );
+
   runApp(MyApp());
 }
 
@@ -274,11 +203,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget page = LoadingPage();
   final storage = const FlutterSecureStorage();
-  late final Uuid _uuid;
-  String? _currentUuid;
 
-  // late final FirebaseMessaging _firebaseMessaging;
-  bool _notificationsEnabled = false;
   late IO.Socket socket;
 
   String? caller;
@@ -288,12 +213,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     checkLogin();
-    _uuid = Uuid();
-    // initFirebase();
-    connectSocket();
+    // connectSocket();
     WidgetsBinding.instance.addObserver(this);
-    //Check call when open app from terminated
-    // checkAndNavigationCallingPage();
     _isAndroidPermissionGranted();
     _requestPermissions();
     _configureDidReceiveLocalNotificationSubject();
@@ -302,15 +223,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Future<void> _isAndroidPermissionGranted() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final bool granted = await flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>()
-              ?.areNotificationsEnabled() ??
-          false;
-
-      setState(() {
-        _notificationsEnabled = granted;
-      });
+      setState(() {});
     }
   }
 
@@ -338,10 +251,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
 
-      final bool? granted = await androidImplementation?.requestPermission();
-      setState(() {
-        _notificationsEnabled = granted ?? false;
-      });
+      setState(() {});
     }
   }
 
@@ -414,23 +324,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       socket.on("calling", (msg) async {
         // ignore: avoid_print
         print("Nhận cuộc gọi: ${msg[0]}");
-        // NavigationService.instance
-        //   .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
         setState(() {
           caller = msg[1];
           creceiver = msg[0];
         });
         await _showNotificationWithActions();
-        // Navigator.push(
-        //   NavigationService.instance.navigationKey.currentContext ?? context,
-        //   MaterialPageRoute(
-        //     builder: (context) => VideoCallScreen(
-        //       caller: msg[1],
-        //       creceiver: msg[0],
-        //       callStatus: false,
-        //     ),
-        //   ),
-        // );
       });
     });
   }
@@ -438,8 +336,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void checkLogin() async {
     String? token = await storage.read(key: "token");
     if (token != null) {
+      try {
+        await connectSocket();
+      } catch (e) {
+        // ignore: avoid_print
+        print(e);
+      }
       setState(() {
-        page = const Homescreen();
+        page = Homescreen();
       });
     } else {
       setState(() {
@@ -455,10 +359,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'OpenSans',
-        primaryColor: const Color(0xFF075E54),
+        primaryColor: Colors.white,
+        // const Color(0xFF075E54),
         colorScheme: const ColorScheme(
           brightness: Brightness.light,
-          primary: Color(0xFF075E54),
+          primary: Colors.white,
           onPrimary: Colors.white,
           secondary: Color(0xFF128C7E),
           onSecondary: Colors.white,
@@ -471,46 +376,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
       ),
       home: page,
-      // onGenerateRoute: AppRoute.generateRoute,
-      // initialRoute: AppRoute.homePage,
       navigatorKey: NavigationService.instance.navigationKey,
       navigatorObservers: <NavigatorObserver>[
         NavigationService.instance.routeObserver
       ],
     );
   }
-
-  // getCurrentCall() async {
-  //   //check current call from pushkit if possible
-  //   var calls = await FlutterCallkitIncoming.activeCalls();
-  //   if (calls is List) {
-  //     if (calls.isNotEmpty) {
-  //       print('DATA: $calls');
-  //       _currentUuid = calls[0]['id'];
-  //       return calls[0];
-  //     } else {
-  //       _currentUuid = "";
-  //       return null;
-  //     }
-  //   }
-  // }
-
-  // checkAndNavigationCallingPage() async {
-  //   var currentCall = await getCurrentCall();
-  //   if (currentCall != null) {
-  //     NavigationService.instance
-  //         .pushNamedIfNotCurrent(AppRoute.callingPage, args: currentCall);
-  //   }
-  // }
-
-  // @override
-  // Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-  //   print(state);
-  //   if (state == AppLifecycleState.resumed) {
-  //     //Check call when open app from background
-  //     checkAndNavigationCallingPage();
-  //   }
-  // }
 
   @override
   void dispose() {
@@ -519,27 +390,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     selectNotificationStream.close();
     super.dispose();
   }
-
-  // initFirebase() async {
-  //   await Firebase.initializeApp();
-  //   _firebaseMessaging = FirebaseMessaging.instance;
-  //   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-  //     print(
-  //         'Message title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data}');
-  //     _currentUuid = _uuid.v4();
-  //     showCallkitIncoming(_currentUuid!);
-  //   });
-  //   _firebaseMessaging.getToken().then((token) {
-  //     print('Device Token FCM: $token');
-  //   });
-  // }
-
-  // Future<void> getDevicePushTokenVoIP() async {
-  //   var devicePushTokenVoIP =
-  //       await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-  //   print(devicePushTokenVoIP);
-  // }
 
   Future<void> _showNotificationWithActions() async {
     const AndroidNotificationDetails androidNotificationDetails =

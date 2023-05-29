@@ -9,11 +9,15 @@ part of 'OthersStatusModel.dart';
 OthersStatusModel _$OthersStatusModelFromJson(Map<String, dynamic> json) =>
     OthersStatusModel(
       displayName: json['displayName'] as String,
-      avatarImage: json['avatarImage'] as String,
+      avatarImage:
+          json['avatarImage'] == null ? "" : json['avatarImage'] as String,
       lastSeenAt: json['lastSeenAt'] == null
           ? DateTime.parse('2023-01-01')
           : DateTime.parse(json['lastSeenAt'] as String),
-      isGroup: json['isGroup'] as bool,
+      isGroup: json['isGroup'] == null ? false : json['isGroup'] as bool,
+      precense: json['precense'] == null
+          ? "Không hoạt động"
+          : json['precense'] as String,
     );
 
 Map<String, dynamic> _$OthersStatusModelToJson(OthersStatusModel instance) =>
@@ -22,4 +26,5 @@ Map<String, dynamic> _$OthersStatusModelToJson(OthersStatusModel instance) =>
       'avatarImage': instance.avatarImage,
       'lastSeenAt': instance.lastSeenAt,
       'isGroup': instance.isGroup,
+      'precense': instance.precense,
     };

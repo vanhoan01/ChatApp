@@ -11,7 +11,7 @@ class ChatModel {
   late String displayName;
   late String avatarImage;
   late bool isGroup;
-  late String timestamp;
+  late DateTime timestamp;
   late String currentMessage;
   late String status;
   late bool select = false;
@@ -34,7 +34,15 @@ class ChatModel {
     required this.status,
     this.select = false,
   });
+  ChatModel.Forward({
+    required this.userName,
+    required this.displayName,
+    required this.avatarImage,
+  });
+
   factory ChatModel.fromJson(Map<String, dynamic> json) =>
       _$ChatModelFromJson(json);
+  factory ChatModel.forwardFromJson(Map<String, dynamic> json) =>
+      _$ForwardFromJson(json);
   Map<String, dynamic> toJson() => _$ChatModelToJson(this);
 }

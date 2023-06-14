@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: const Text(
                   'ChatApp',
                   style: TextStyle(
-                    color: Colors.teal,
+                    color: Colors.blue,
                     fontWeight: FontWeight.w700,
                     fontSize: 30,
                   ),
@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               hintText: "Số điện thoại hoặc tài khoản",
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Colors.teal), //<-- SEE HERE
+                                    color: Colors.blue), //<-- SEE HERE
                               ),
                             ),
                           )
@@ -114,7 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               hintText: "Mật khẩu",
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: Colors.teal), //<-- SEE HERE
+                                    color: Colors.blue), //<-- SEE HERE
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue),
                               ),
                             ),
                           )
@@ -125,58 +128,63 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {},
                       child: const Text(
                         'Quên mật khẩu?',
+                        style: TextStyle(color: Colors.black),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
+                    Container(
+                      height: 50,
+                      margin: const EdgeInsets.symmetric(
                           horizontal: 11, vertical: 10.0),
-                      child: Container(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        child: ElevatedButton(
-                          child: const Text(
-                            'Đăng nhập',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          onPressed: () async {
-                            if (_globalkey.currentState!.validate()) {
-                              var response = await userViewModel.login(
-                                  _usernameController.text,
-                                  _passwordController.text);
-                              if (response.statusCode == 200 ||
-                                  response.statusCode == 201) {
-                                Map<String, dynamic> output =
-                                    json.decode(response.body);
-                                // ignore: avoid_print
-                                print(output["token"]);
-                                await storage.write(
-                                    key: "token", value: output["token"]);
-                                // setState(() {
-                                //   validate = true;
-                                //   circular = false;
-                                // });
-                                // ignore: use_build_context_synchronously
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Homescreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              } else {
-                                // ScaffoldMessenger.of(context)
-                                //     .showSnackBar(SnackBar(
-                                //   content: Text("Netwok Error"),
-                                // ));
-                                showSnack("Netwok Error");
-                              }
-                            }
-                          },
+                      width: MediaQuery.of(context).size.width,
+                      // color: Colors.blue,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              Colors.blue, // Text Color (Foreground color)
                         ),
+                        child: const Text(
+                          'Đăng nhập',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onPressed: () async {
+                          if (_globalkey.currentState!.validate()) {
+                            var response = await userViewModel.login(
+                                _usernameController.text,
+                                _passwordController.text);
+                            if (response.statusCode == 200 ||
+                                response.statusCode == 201) {
+                              Map<String, dynamic> output =
+                                  json.decode(response.body);
+                              // ignore: avoid_print
+                              print(output["token"]);
+                              await storage.write(
+                                  key: "token", value: output["token"]);
+                              // setState(() {
+                              //   validate = true;
+                              //   circular = false;
+                              // });
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Homescreen(),
+                                ),
+                                (route) => false,
+                              );
+                            } else {
+                              // ScaffoldMessenger.of(context)
+                              //     .showSnackBar(SnackBar(
+                              //   content: Text("Netwok Error"),
+                              // ));
+                              showSnack("Netwok Error");
+                            }
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -189,8 +197,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     child: const Text(
                       'Đăng ký',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
                     ),
                     onPressed: () {
                       Navigator.push(

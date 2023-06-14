@@ -18,36 +18,6 @@ class CameraViewPage extends StatelessWidget {
       backgroundColor: Colors.black12,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.crop_rotate,
-              size: 27,
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.emoji_emotions_outlined,
-              size: 27,
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.title,
-              size: 27,
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.edit,
-              size: 27,
-            ),
-          ),
-        ],
       ),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -78,7 +48,7 @@ class CameraViewPage extends StatelessWidget {
                   minLines: 1,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Add Caption...",
+                    // hintText: "Add Caption...",
                     prefixIcon: const Icon(
                       Icons.add_photo_alternate,
                       color: Colors.white,
@@ -90,9 +60,7 @@ class CameraViewPage extends StatelessWidget {
                     ),
                     suffixIcon: InkWell(
                       onTap: () {
-                        onImageSend(path
-                            // _editingController.text.trim(),
-                            );
+                        onImageSend(path);
                       },
                       child: CircleAvatar(
                         radius: 27,

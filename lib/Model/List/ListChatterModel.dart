@@ -11,6 +11,8 @@ class ListChatterModel {
   ListChatterModel({this.data});
   factory ListChatterModel.fromJson(Map<String, dynamic> json) =>
       _$ListChatterModelFromJson(json);
+  factory ListChatterModel.fromJsonSearch(Map<String, dynamic> json) =>
+      _$ListChatterModelFromJsonSearch(json);
   Map<String, dynamic> toJson() => _$ListChatterModelToJson(this);
 }
 //flutter pub run build_runner build

@@ -3,10 +3,12 @@
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ReactModel.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesAudioView.dart';
+import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesCallView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesFileView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesImageView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesLocationView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesTextView.dart';
+import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesVideoView.dart';
 import 'package:chatapp/View/Components/ChatPage/PopupMenuWidget.dart';
 import 'package:chatapp/View/Screens/Conversation/ForwardScreen.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
@@ -16,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OwnMessageCard extends StatefulWidget {
-  const OwnMessageCard({
+  OwnMessageCard({
     Key? key,
     required this.userId,
     required this.chatMM,
@@ -26,7 +28,7 @@ class OwnMessageCard extends StatefulWidget {
   }) : super(key: key);
   final String userId;
   final String userName;
-  final ChatMessagesModel chatMM;
+  ChatMessagesModel chatMM;
   final DateTime timeAfter;
   final Function(String, String, String)? setReply;
 
@@ -38,10 +40,15 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
   Offset _tapPosition = Offset.zero;
   ChatMessagesViewModel chatMessagesViewModel = ChatMessagesViewModel();
   ChatMessagesModel? chatReply;
+  bool forward = false;
 
   @override
   void initState() {
     getChatReply();
+
+    if (widget.chatMM.type == "Forward") {
+      getChatForward();
+    }
     super.initState();
   }
 
@@ -56,12 +63,46 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
     }
   }
 
+  void getChatForward() async {
+    if (widget.chatMM.type == "Forward") {
+      ChatMessagesModel data =
+          await chatMessagesViewModel.getMessageByID(widget.chatMM.text);
+
+      setState(() {
+        widget.chatMM = data;
+        forward = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Align(alignment: Alignment.bottomCenter, child: timeView()),
+        forward == true
+            ? const Align(
+                alignment: Alignment.bottomRight,
+                child: SizedBox(
+                  width: 160,
+                  child: ListTile(
+                    visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+                    leading: Icon(
+                      Icons.forward,
+                      size: 18,
+                    ),
+                    title: Align(
+                      alignment: Alignment(-6, 0),
+                      child: Text(
+                        "Đã chuyển tiếp",
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ),
+                    minLeadingWidth: 1,
+                  ),
+                ))
+            : Container(),
         Stack(
           alignment: Alignment.bottomRight,
           children: [
@@ -77,35 +118,58 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
                                   ? 40
                                   : 20
                               : 20),
-                      child: widget.chatMM.type == "text" ||
-                              widget.chatMM.type == "Video call" ||
-                              widget.chatMM.type == "Forward"
-                          ? MessagesTextView(
-                              text: chatReply != null ? chatReply!.text : "",
+                      child: widget.chatMM.type == "image"
+                          ? MessagesImageView(
+                              path: chatReply != null ? chatReply!.text : "",
                               reply: true,
+                              color: false,
                             )
-                          : widget.chatMM.type == "image"
-                              ? MessagesImageView(
+                          : widget.chatMM.type == "video"
+                              ? MessagesVideoView(
                                   path:
                                       chatReply != null ? chatReply!.text : "",
                                   reply: true,
+                                  color: false,
                                 )
                               : widget.chatMM.type == "file"
                                   ? MessagesFileView(
                                       name: widget.chatMM.text,
                                       size: widget.chatMM.size ?? 0,
                                       reply: true,
+                                      color: false,
                                     )
                                   : widget.chatMM.type == "audio"
                                       ? MessagesAudioView(
                                           name: widget.chatMM.text,
                                           size: widget.chatMM.size ?? 0,
                                           reply: true,
+                                          color: false,
                                         )
-                                      : MessagesLocationView(
-                                          name: widget.chatMM.text,
-                                          reply: true,
-                                        ),
+                                      : widget.chatMM.type == "Video call"
+                                          ? MessagesCallView(
+                                              myUserName: widget.userName,
+                                              author: widget.chatMM.author,
+                                              partition:
+                                                  widget.chatMM.partition ?? "",
+                                              type: widget.chatMM.type,
+                                              callTime: widget.chatMM.size ?? 0,
+                                              isGroup: widget.chatMM.isGroup ??
+                                                  false,
+                                              color: false,
+                                            )
+                                          : widget.chatMM.type == "location"
+                                              ? MessagesLocationView(
+                                                  name: widget.chatMM.text,
+                                                  reply: true,
+                                                  color: false,
+                                                )
+                                              : MessagesTextView(
+                                                  text: chatReply != null
+                                                      ? chatReply!.text
+                                                      : "",
+                                                  reply: true,
+                                                  color: false,
+                                                ),
                     ),
                   )
                 : Container(),
@@ -134,34 +198,55 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
                     _showContextMenu(context);
                   },
                   onTapDown: (details) => _getTapPosition(details),
-                  child: widget.chatMM.type == "text" ||
-                          widget.chatMM.type == "Video call" ||
-                          widget.chatMM.type == "Forward"
-                      ? MessagesTextView(
-                          text: widget.chatMM.text,
+                  child: widget.chatMM.type == "image"
+                      ? MessagesImageView(
+                          path: widget.chatMM.text,
                           reply: false,
+                          color: true,
                         )
-                      : widget.chatMM.type == "image"
-                          ? MessagesImageView(
+                      : widget.chatMM.type == "video"
+                          ? MessagesVideoView(
                               path: widget.chatMM.text,
                               reply: false,
+                              color: true,
                             )
                           : widget.chatMM.type == "file"
                               ? MessagesFileView(
                                   name: widget.chatMM.text,
                                   size: widget.chatMM.size ?? 0,
                                   reply: false,
+                                  color: true,
                                 )
                               : widget.chatMM.type == "audio"
                                   ? MessagesAudioView(
                                       name: widget.chatMM.text,
                                       size: widget.chatMM.size ?? 0,
                                       reply: false,
+                                      color: true,
                                     )
-                                  : MessagesLocationView(
-                                      name: widget.chatMM.text,
-                                      reply: false,
-                                    ),
+                                  : widget.chatMM.type == "Video call"
+                                      ? MessagesCallView(
+                                          myUserName: widget.userName,
+                                          author: widget.chatMM.author,
+                                          partition:
+                                              widget.chatMM.partition ?? "",
+                                          type: widget.chatMM.type,
+                                          callTime: widget.chatMM.size ?? 0,
+                                          isGroup:
+                                              widget.chatMM.isGroup ?? false,
+                                          color: true,
+                                        )
+                                      : widget.chatMM.type == "location"
+                                          ? MessagesLocationView(
+                                              name: widget.chatMM.text,
+                                              reply: true,
+                                              color: true,
+                                            )
+                                          : MessagesTextView(
+                                              text: widget.chatMM.text,
+                                              reply: false,
+                                              color: true,
+                                            ),
                 ),
               ),
             ),
@@ -308,6 +393,9 @@ class _OwnMessageCardState extends State<OwnMessageCard> {
   }
 
   int checkUserReact(String reactKey) {
+    if (widget.chatMM.reacts == null) {
+      return 0;
+    }
     if (widget.chatMM.reacts!
         .where(
             (react) => react.userId == widget.userId && react.react == reactKey)

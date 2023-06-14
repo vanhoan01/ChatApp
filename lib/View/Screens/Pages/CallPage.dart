@@ -2,6 +2,7 @@
 
 import 'package:chatapp/Model/Model/CallModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
+import 'package:chatapp/View/Screens/Call/VideoCallScreen.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
 import 'package:chatapp/ViewModel/ChatPage/text_time_vm.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,12 @@ class CallPage extends StatefulWidget {
 class _CallPageState extends State<CallPage> {
   ChatMessagesViewModel chatMessagesViewModel = ChatMessagesViewModel();
   List<CallModel> callModelList = [];
+  bool loading = true;
 
   @override
   void initState() {
-    getCalls();
     super.initState();
+    getCalls();
   }
 
   @override
@@ -41,11 +43,15 @@ class _CallPageState extends State<CallPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-          itemCount: callModelList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return callCard(callModelList[index]);
-          }),
+      body: loading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: callModelList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return callCard(callModelList[index]);
+              }),
     );
   }
 
@@ -54,6 +60,7 @@ class _CallPageState extends State<CallPage> {
     // NavigationService.instance.navigationKey.currentContext ?? context,
     setState(() {
       callModelList = data;
+      loading = false;
     });
   }
 
@@ -62,6 +69,18 @@ class _CallPageState extends State<CallPage> {
       color: Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 2),
       child: ListTile(
+        onTap: () {
+          // Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //               builder: (context) => VideoCallScreen(
+          //                 caller: sourceChat!.userName,
+          //                 creceiver: callModel.,
+          //                 callStatus: true,
+          //               ),
+          //             ),
+          //           );
+        },
         visualDensity: const VisualDensity(horizontal: 0, vertical: -2),
         leading: CircleAvatar(
           radius: 22,
@@ -109,7 +128,7 @@ class _CallPageState extends State<CallPage> {
         trailing: Icon(
           callModel.type == "Video call" ? Icons.videocam_rounded : Icons.call,
           size: 28,
-          color: Colors.teal,
+          color: Colors.blue,
         ),
       ),
     );

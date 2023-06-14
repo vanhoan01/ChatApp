@@ -3,14 +3,17 @@
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:chatapp/View/Screens/Camera/CameraViewPage.dart';
-import 'package:chatapp/View/Screens/VideoView.dart';
+import 'package:chatapp/View/Screens/Camera/VideoViewPage.dart';
 import 'package:flutter/material.dart';
 
 late List<CameraDescription> cameras;
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key, required this.onImageSend}) : super(key: key);
+  const CameraScreen(
+      {Key? key, required this.onImageSend, required this.onVideoSend})
+      : super(key: key);
   final Function onImageSend;
+  final Function onVideoSend;
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -137,8 +140,9 @@ class _CameraScreenState extends State<CameraScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (builder) =>
-                                  VideoViewPage(path: videoFile!.path),
+                              builder: (builder) => VideoViewPage(
+                                  path: videoFile!.path,
+                                  onVideoSend: widget.onVideoSend),
                             ),
                           );
                         },

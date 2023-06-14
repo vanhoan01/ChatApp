@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoViewPage extends StatefulWidget {
-  const VideoViewPage({Key? key, required this.path}) : super(key: key);
+  const VideoViewPage({Key? key, required this.path, required this.onVideoSend})
+      : super(key: key);
   final String path;
+  final Function onVideoSend;
 
   @override
   State<VideoViewPage> createState() => _VideoViewPageState();
@@ -27,6 +29,13 @@ class _VideoViewPageState extends State<VideoViewPage> {
   }
 
   @override
+  void dispose() {
+    _controller.pause();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black12,
@@ -35,40 +44,40 @@ class _VideoViewPageState extends State<VideoViewPage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.crop_rotate,
               size: 27,
             ),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.emoji_emotions_outlined,
               size: 27,
             ),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.title,
               size: 27,
             ),
           ),
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.edit,
               size: 27,
             ),
           ),
         ],
       ),
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height - 150,
               child: AspectRatio(
@@ -88,9 +97,9 @@ class _VideoViewPageState extends State<VideoViewPage> {
               child: Container(
                 color: Colors.black38,
                 width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                 child: TextFormField(
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 17,
                   ),
@@ -98,23 +107,28 @@ class _VideoViewPageState extends State<VideoViewPage> {
                   minLines: 1,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: "Add Caption...",
-                    prefixIcon: Icon(
+                    // hintText: "Add Caption...",
+                    prefixIcon: const Icon(
                       Icons.add_photo_alternate,
                       color: Colors.white,
                       size: 27,
                     ),
-                    hintStyle: TextStyle(
+                    hintStyle: const TextStyle(
                       color: Colors.white,
                       fontSize: 17,
                     ),
-                    suffixIcon: CircleAvatar(
-                      radius: 27,
-                      backgroundColor: Colors.tealAccent[700],
-                      child: Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 27,
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        widget.onVideoSend(widget.path);
+                      },
+                      child: CircleAvatar(
+                        radius: 27,
+                        backgroundColor: Colors.tealAccent[700],
+                        child: const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 27,
+                        ),
                       ),
                     ),
                   ),

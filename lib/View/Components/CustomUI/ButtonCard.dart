@@ -14,7 +14,7 @@ class ButtonCard extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(vertical: 7, horizontal: 15),
       leading: CircleAvatar(
         radius: 23,
-        backgroundColor: const Color(0xFF25D266),
+        backgroundColor: Colors.blue,
         child: Icon(
           icon,
           size: 26,

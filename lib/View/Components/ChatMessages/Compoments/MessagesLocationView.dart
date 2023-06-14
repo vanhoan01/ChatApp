@@ -10,9 +10,11 @@ class MessagesLocationView extends StatefulWidget {
     Key? key,
     required this.name,
     this.reply,
+    required this.color,
   }) : super(key: key);
   final String name;
   final bool? reply;
+  final bool color;
 
   @override
   State<MessagesLocationView> createState() => _MessagesLocationViewState();
@@ -49,11 +51,10 @@ class _MessagesLocationViewState extends State<MessagesLocationView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.reply == null
-          ? const Color(0xffdcf8c6)
-          : widget.reply == false
-              ? const Color(0xffdcf8c6)
-              : Colors.grey.shade200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: widget.color ? Colors.blue : Colors.grey.shade200,
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       padding: const EdgeInsets.only(right: 10),
       child: Column(
@@ -76,20 +77,24 @@ class _MessagesLocationViewState extends State<MessagesLocationView> {
           const SizedBox(
             height: 3,
           ),
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text(
               "Vị trí đã ghim",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: widget.color ? Colors.white : Colors.black,
+              ),
             ),
           ),
           const SizedBox(
             height: 3,
           ),
-          Text(
-            address,
-            maxLines: 2,
-          ),
+          Text(address,
+              maxLines: 2,
+              style: TextStyle(
+                color: widget.color ? Colors.white : Colors.black,
+              )),
         ],
       ),
     );

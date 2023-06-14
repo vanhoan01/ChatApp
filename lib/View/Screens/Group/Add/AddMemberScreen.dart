@@ -1,25 +1,31 @@
 // ignore_for_file: file_names
 
 import 'package:chatapp/Model/List/ListChatterModel.dart';
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/ChatterModel.dart';
 import 'package:chatapp/View/Components/CustomUI/AvtarCard.dart';
 import 'package:chatapp/View/Components/CustomUI/ContactCard.dart';
-import 'package:chatapp/View/Screens/NewGroup.dart';
+import 'package:chatapp/View/Screens/Conversation/ConversationScreen.dart';
 import 'package:chatapp/View/Screens/SearchScreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
+import 'package:chatapp/ViewModel/ConversationViewModel.dart';
 import 'package:flutter/material.dart';
 
-class CreateGroup extends StatefulWidget {
-  const CreateGroup({Key? key}) : super(key: key);
+class AddMemberScreen extends StatefulWidget {
+  const AddMemberScreen({Key? key, required this.chatModel}) : super(key: key);
+  final ChatModel chatModel;
 
   @override
-  State<CreateGroup> createState() => _CreateGroupState();
+  State<AddMemberScreen> createState() => _AddMemberScreenState();
 }
 
-class _CreateGroupState extends State<CreateGroup> {
+class _AddMemberScreenState extends State<AddMemberScreen> {
   NetworkHandler networkHandler = NetworkHandler();
+  final ConversationViewModel _conversationViewModel = ConversationViewModel();
   List<ChatterModel> contacts = [];
   List<ChatterModel> groups = [];
+  ChatMessagesViewModel chatMessagesViewModel = ChatMessagesViewModel();
 
   @override
   void initState() {
@@ -55,24 +61,17 @@ class _CreateGroupState extends State<CreateGroup> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Nhóm mới',
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              'Thêm người tham gia',
-              style: TextStyle(
-                fontSize: 13,
-              ),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
+        title: const Text(
+          'Thêm thành viên',
+          style: TextStyle(
+              fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         actions: [
           IconButton(
@@ -82,10 +81,7 @@ class _CreateGroupState extends State<CreateGroup> {
                 delegate: SearchScreen(),
               );
             },
-            icon: const Icon(
-              Icons.search,
-              size: 26,
-            ),
+            icon: const Icon(Icons.search, size: 26, color: Colors.black),
           ),
         ],
       ),
@@ -152,17 +148,50 @@ class _CreateGroupState extends State<CreateGroup> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (builder) => NewGroup(groups: groups),
-            ),
-          );
+        onPressed: () async {
+          List<Map<String, String>> members = groups
+              .map((e) =>
+                  {"userName": e.userName, "memberShipStatus": "Thành viên"})
+              .toList();
+          var response = await _conversationViewModel.addMembers(
+              widget.chatModel.userName, members);
+
+          if (response.statusCode == 200) {
+            // ignore: use_build_context_synchronously
+            for (var e in groups) {
+              await sendNotify(
+                  "@${e.userName} đã tham gia nhóm", true, e.userName);
+            }
+            // ignore: use_build_context_synchronously
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (builder) =>
+                    ConversationScreen(chatModel: widget.chatModel),
+              ),
+            );
+          }
         },
         backgroundColor: const Color(0xFF128C7E),
         child: const Icon(Icons.arrow_forward),
       ),
     );
+  }
+
+  Future<void> sendNotify(String text, bool isGroup, String userName) async {
+    //database
+    String id = await chatMessagesViewModel.addChatMessage(
+      userName,
+      widget.chatModel.userName,
+      isGroup,
+      "Notification",
+      text,
+      DateTime.now(),
+      "",
+    );
+    // ignore: avoid_print
+    print(id);
+
+    //local
   }
 }

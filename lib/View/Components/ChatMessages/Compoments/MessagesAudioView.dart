@@ -12,10 +12,12 @@ class MessagesAudioView extends StatefulWidget {
     required this.name,
     required this.size,
     this.reply,
+    required this.color,
   }) : super(key: key);
   final String name;
   final int size;
   final bool? reply;
+  final bool color;
 
   @override
   State<MessagesAudioView> createState() => _MessagesAudioViewState();
@@ -89,11 +91,10 @@ class _MessagesAudioViewState extends State<MessagesAudioView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.reply == null
-          ? const Color(0xffdcf8c6)
-          : widget.reply == false
-              ? const Color(0xffdcf8c6)
-              : Colors.grey.shade200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: widget.color ? Colors.blue : Colors.grey.shade200,
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       padding: const EdgeInsets.only(right: 10),
       child: Row(
@@ -151,7 +152,10 @@ class _MessagesAudioViewState extends State<MessagesAudioView> {
           ),
           Text(
             formatTime((duration - position).inSeconds),
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontSize: 16,
+              color: widget.color ? Colors.white : Colors.black,
+            ),
           ),
         ],
       ),

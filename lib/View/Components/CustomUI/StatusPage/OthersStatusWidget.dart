@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
 
 import 'dart:math';
-
-import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/OthersStatusModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
+import 'package:chatapp/View/Screens/Conversation/ConversationScreen.dart';
 import 'package:flutter/material.dart';
 
 class OthersStatusWidget extends StatelessWidget {
@@ -15,6 +15,23 @@ class OthersStatusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (builder) => ConversationScreen(
+              chatModel: ChatModel(
+                userName: othersStatusModel.userName,
+                avatarImage: othersStatusModel.avatarImage,
+                currentMessage: "",
+                displayName: othersStatusModel.displayName,
+                isGroup: othersStatusModel.isGroup,
+                timestamp: DateTime.now(),
+              ),
+            ),
+          ),
+        );
+      },
       leading: Stack(
         children: [
           CircleAvatar(

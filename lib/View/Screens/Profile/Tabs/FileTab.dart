@@ -6,7 +6,8 @@ import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
 import 'package:flutter/material.dart';
 
 class FileTab extends StatefulWidget {
-  const FileTab({super.key});
+  const FileTab({super.key, this.otherUserName});
+  final String? otherUserName;
 
   @override
   State<FileTab> createState() => _FileTabState();
@@ -23,9 +24,15 @@ class _FileTabState extends State<FileTab> {
   }
 
   void getPhotos() async {
-    List<ChatMessagesModel>? data = await chatMessagesViewModel.getFiles();
+    List<ChatMessagesModel>? data;
+    if (widget.otherUserName == null) {
+      data = await chatMessagesViewModel.getFiles();
+    } else {
+      data =
+          await chatMessagesViewModel.getOtherFiles(widget.otherUserName ?? "");
+    }
     setState(() {
-      chatMessagesList = data;
+      chatMessagesList = data!;
     });
   }
 

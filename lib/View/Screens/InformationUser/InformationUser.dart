@@ -1,99 +1,78 @@
 // ignore_for_file: file_names
 
 import 'package:chatapp/Resources/app_urls.dart';
-import 'package:chatapp/View/Screens/Pages/ProfilePage.dart';
+import 'package:chatapp/View/Screens/Profile/GroupProfileScreen.dart';
+import 'package:chatapp/View/Screens/Profile/OtherProfileScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class InformationUser extends StatefulWidget {
-  const InformationUser(
-      {super.key,
-      required this.userName,
-      required this.displayName,
-      required this.avatarImage});
+  const InformationUser({
+    super.key,
+    required this.userName,
+    required this.displayName,
+    required this.avatarImage,
+    required this.isGroup,
+    required this.myUserName,
+  });
 
   final String userName;
   final String displayName;
   final String avatarImage;
+  final bool isGroup;
+  final String myUserName;
   @override
   State<InformationUser> createState() => _InformationUserState();
 }
 
 class _InformationUserState extends State<InformationUser> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("userName: ${widget.userName}");
+    print("isGroup: ${widget.isGroup}");
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4.0),
+          child: Container(
+            height: 0.5,
+            color: Colors.grey.shade400,
+          ),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(
+            Icons.navigate_before,
+            color: Colors.black,
+            size: 30,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-          )
-        ],
+        title: const Text(
+          "Chi tiết",
+          style: TextStyle(
+              fontWeight: FontWeight.w600, color: Colors.black, fontSize: 18),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 30),
-            CircleAvatar(
-              backgroundImage: widget.avatarImage != null
-                  ? NetworkImage(
-                      "${AppUrl.imageUrl}${widget.avatarImage}",
-                    )
-                  : null,
-              // ignore: sort_child_properties_last
-              child: widget.avatarImage == null
-                  ? SvgPicture.asset(
-                      'assets/person.svg',
-                      color: Colors.white,
-                      height: 35,
-                      width: 35,
-                    )
-                  : null,
-              backgroundColor: Colors.blueGrey,
-              radius: 55,
+            UserItem(context),
+            Container(
+              height: 0.5,
+              width: double.infinity,
+              color: Colors.grey.shade400,
+              margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
             ),
-            const SizedBox(height: 10),
-            Text(
-              widget.displayName,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  actionButton(Icons.call, "Gọi thoại", () {}),
-                  actionButton(Icons.videocam, "Gọi video", () {}),
-                  actionButton(Icons.person, "Trang cá nhân", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProfilePage(),
-                      ),
-                    );
-                  }),
-                  actionButton(
-                      Icons.notifications_rounded, "Tắt thông báo", () {}),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                groupTitle('Hành động khác'),
-                actionTile(
-                    Icons.image, 'Xem file phương tiện, file & liên kết'),
-                actionTile(Icons.image, 'Xem tin nhắn đã ghim'),
-                actionTile(Icons.image, 'Tìm kiếm trong cuộc trò chuyện'),
-              ],
-            ),
+            actionTile(Icons.image, 'Xem file phương tiện, file & liên kết'),
+            actionTile(Icons.block, 'Chặn'),
+            // actionTile(Icons.image, 'Tìm kiếm trong cuộc trò chuyện'),
           ],
         ),
       ),
@@ -125,6 +104,49 @@ class _InformationUserState extends State<InformationUser> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ignore: non_constant_identifier_names
+  Widget UserItem(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (builder) => widget.isGroup
+                ? GroupProfileScreen(
+                    id: widget.userName, myUserName: widget.myUserName)
+                : OtherProfileScreen(
+                    userName: widget.userName, myUserName: widget.myUserName),
+          ),
+        );
+      },
+      child: ListTile(
+        leading: CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.white,
+          backgroundImage:
+              NetworkImage("${AppUrl.imageUrl}${widget.avatarImage}"),
+        ),
+        title: Text(
+          widget.displayName,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        subtitle: const Text(
+          "Xem hồ sơ",
+          style: TextStyle(
+            color: Colors.black54,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.navigate_next,
+          size: 26,
         ),
       ),
     );

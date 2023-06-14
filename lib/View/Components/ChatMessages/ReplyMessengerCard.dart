@@ -4,27 +4,33 @@ import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ReactModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesAudioView.dart';
+import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesCallView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesFileView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesImageView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesLocationView.dart';
 import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesTextView.dart';
+import 'package:chatapp/View/Components/ChatMessages/Compoments/MessagesVideoView.dart';
 import 'package:chatapp/View/Components/ChatPage/PopupMenuWidget.dart';
+import 'package:chatapp/View/Screens/Conversation/ForwardScreen.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
 import 'package:chatapp/ViewModel/ChatPage/text_time_vm.dart';
 import 'package:chatapp/ViewModel/UserViewModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ReplyMessengerCard extends StatefulWidget {
-  const ReplyMessengerCard({
+  ReplyMessengerCard({
     Key? key,
     required this.userId,
     required this.chatMM,
     required this.timeAfter,
     this.setReply,
+    required this.userName,
   }) : super(key: key);
   final String userId;
-  final ChatMessagesModel chatMM;
+  final String userName;
+  late ChatMessagesModel chatMM;
   final DateTime timeAfter;
   final Function(String, String, String)? setReply;
 
@@ -38,12 +44,31 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
   ChatMessagesModel? chatReply;
   UserViewModel userViewModel = UserViewModel();
   String? avt;
+  bool forward = false;
 
   @override
   void initState() {
     super.initState();
     getChatReply();
     getAvatar();
+    if (widget.chatMM.type == "Forward") {
+      getChatForward();
+    }
+    if (widget.chatMM.reacts == null) {
+      widget.chatMM.reacts = [];
+    }
+  }
+
+  void getChatForward() async {
+    if (widget.chatMM.type == "Forward") {
+      ChatMessagesModel data =
+          await chatMessagesViewModel.getMessageByID(widget.chatMM.text);
+
+      setState(() {
+        widget.chatMM = data;
+        forward = true;
+      });
+    }
   }
 
   void getChatReply() async {
@@ -98,115 +123,199 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
                 backgroundColor: Colors.blueGrey,
               ),
             ),
-            Stack(
-              alignment: Alignment.bottomRight,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                widget.chatMM.reply != ""
-                    ? ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width / 1.6,
+                forward == true
+                    ? const SizedBox(
+                        width: 160,
+                        child: ListTile(
+                          visualDensity:
+                              VisualDensity(horizontal: 0, vertical: -4),
+                          leading: Icon(
+                            Icons.forward,
+                            size: 18,
+                          ),
+                          title: Align(
+                            alignment: Alignment(-6, 0),
+                            child: Text(
+                              "Đã chuyển tiếp",
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
+                          minLeadingWidth: 1,
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              bottom: widget.chatMM.reacts != null
-                                  ? widget.chatMM.reacts!.isNotEmpty
-                                      ? 40
-                                      : 20
-                                  : 20),
-                          child: widget.chatMM.type == "text" ||
-                                  widget.chatMM.type == "Video call" ||
-                                  widget.chatMM.type == "Forward"
-                              ? MessagesTextView(
-                                  text:
-                                      chatReply != null ? chatReply!.text : "",
-                                  reply: true,
-                                )
-                              : widget.chatMM.type == "image"
+                      )
+                    : Container(),
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    widget.chatMM.reply != ""
+                        ? ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width / 1.6,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  bottom: widget.chatMM.reacts != null
+                                      ? widget.chatMM.reacts!.isNotEmpty
+                                          ? 40
+                                          : 20
+                                      : 20),
+                              child: widget.chatMM.type == "image"
                                   ? MessagesImageView(
                                       path: chatReply != null
                                           ? chatReply!.text
                                           : "",
                                       reply: true,
+                                      color: false,
+                                    )
+                                  : widget.chatMM.type == "video"
+                                      ? MessagesVideoView(
+                                          path: chatReply != null
+                                              ? chatReply!.text
+                                              : "",
+                                          reply: true,
+                                          color: false,
+                                        )
+                                      : widget.chatMM.type == "file"
+                                          ? MessagesFileView(
+                                              name: widget.chatMM.text,
+                                              size: widget.chatMM.size ?? 0,
+                                              reply: true,
+                                              color: false,
+                                            )
+                                          : widget.chatMM.type == "audio"
+                                              ? MessagesAudioView(
+                                                  name: widget.chatMM.text,
+                                                  size: widget.chatMM.size ?? 0,
+                                                  reply: true,
+                                                  color: false,
+                                                )
+                                              : widget.chatMM.type ==
+                                                      "Video call"
+                                                  ? MessagesCallView(
+                                                      myUserName:
+                                                          widget.userName,
+                                                      author:
+                                                          widget.chatMM.author,
+                                                      partition: widget.chatMM
+                                                              .partition ??
+                                                          "",
+                                                      type: widget.chatMM.type,
+                                                      callTime:
+                                                          widget.chatMM.size ??
+                                                              0,
+                                                      isGroup: widget
+                                                              .chatMM.isGroup ??
+                                                          false,
+                                                      color: false,
+                                                    )
+                                                  : widget.chatMM.type ==
+                                                          "location"
+                                                      ? MessagesLocationView(
+                                                          name: widget
+                                                              .chatMM.text,
+                                                          reply: true,
+                                                          color: false,
+                                                        )
+                                                      : MessagesTextView(
+                                                          text: chatReply !=
+                                                                  null
+                                                              ? chatReply!.text
+                                                              : "",
+                                                          reply: true,
+                                                          color: false,
+                                                        ),
+                            ),
+                          )
+                        : Container(),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width / 1.6,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          bottom: widget.chatMM.reacts != null
+                              ? widget.chatMM.reacts!.isNotEmpty
+                                  ? 20
+                                  : 0
+                              : 0,
+                        ),
+                        child: GestureDetector(
+                          onLongPress: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              barrierColor: Colors.transparent,
+                              builder: (BuildContext context) {
+                                return bottomMenu();
+                              },
+                            );
+                            _showContextMenu(context);
+                          },
+                          onTapDown: (details) => _getTapPosition(details),
+                          child: widget.chatMM.type == "image"
+                              ? MessagesImageView(
+                                  path: widget.chatMM.text,
+                                  reply: false,
+                                  color: false,
+                                )
+                              : widget.chatMM.type == "video"
+                                  ? MessagesVideoView(
+                                      path: widget.chatMM.text,
+                                      reply: false,
+                                      color: false,
                                     )
                                   : widget.chatMM.type == "file"
                                       ? MessagesFileView(
                                           name: widget.chatMM.text,
                                           size: widget.chatMM.size ?? 0,
-                                          reply: true,
+                                          reply: false,
+                                          color: false,
                                         )
                                       : widget.chatMM.type == "audio"
                                           ? MessagesAudioView(
                                               name: widget.chatMM.text,
                                               size: widget.chatMM.size ?? 0,
-                                              reply: true,
+                                              reply: false,
+                                              color: false,
                                             )
-                                          : MessagesLocationView(
-                                              name: widget.chatMM.text,
-                                              reply: true,
-                                            ),
+                                          : widget.chatMM.type == "Video call"
+                                              ? MessagesCallView(
+                                                  myUserName: widget.userName,
+                                                  author: widget.chatMM.author,
+                                                  partition:
+                                                      widget.chatMM.partition ??
+                                                          "",
+                                                  type: widget.chatMM.type,
+                                                  callTime:
+                                                      widget.chatMM.size ?? 0,
+                                                  isGroup:
+                                                      widget.chatMM.isGroup ??
+                                                          false,
+                                                  color: false,
+                                                )
+                                              : widget.chatMM.type == "location"
+                                                  ? MessagesLocationView(
+                                                      name: widget.chatMM.text,
+                                                      reply: true,
+                                                      color: false,
+                                                    )
+                                                  : MessagesTextView(
+                                                      text: widget.chatMM.text,
+                                                      reply: false,
+                                                      color: false,
+                                                    ),
                         ),
-                      )
-                    : Container(),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width / 1.6,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      bottom: widget.chatMM.reacts != null
-                          ? widget.chatMM.reacts!.isNotEmpty
-                              ? 20
-                              : 0
-                          : 0,
+                      ),
                     ),
-                    child: GestureDetector(
-                      onLongPress: () {
-                        showModalBottomSheet<void>(
-                          context: context,
-                          barrierColor: Colors.transparent,
-                          builder: (BuildContext context) {
-                            return bottomMenu();
-                          },
-                        );
-                        _showContextMenu(context);
-                      },
-                      onTapDown: (details) => _getTapPosition(details),
-                      child: widget.chatMM.type == "text" ||
-                              widget.chatMM.type == "Video call" ||
-                              widget.chatMM.type == "Forward"
-                          ? MessagesTextView(
-                              text: widget.chatMM.text,
-                              reply: false,
-                            )
-                          : widget.chatMM.type == "image"
-                              ? MessagesImageView(
-                                  path: widget.chatMM.text,
-                                  reply: false,
-                                )
-                              : widget.chatMM.type == "file"
-                                  ? MessagesFileView(
-                                      name: widget.chatMM.text,
-                                      size: widget.chatMM.size ?? 0,
-                                      reply: false,
-                                    )
-                                  : widget.chatMM.type == "audio"
-                                      ? MessagesAudioView(
-                                          name: widget.chatMM.text,
-                                          size: widget.chatMM.size ?? 0,
-                                          reply: false,
-                                        )
-                                      : MessagesLocationView(
-                                          name: widget.chatMM.text,
-                                          reply: false,
-                                        ),
-                    ),
-                  ),
+                    widget.chatMM.reacts != null
+                        ? widget.chatMM.reacts!.isNotEmpty
+                            ? reactionsView()
+                            : Container()
+                        : Container(),
+                  ],
                 ),
-                widget.chatMM.reacts != null
-                    ? widget.chatMM.reacts!.isNotEmpty
-                        ? reactionsView()
-                        : Container()
-                    : Container(),
               ],
             ),
           ],
@@ -347,6 +456,9 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
   }
 
   int checkUserReact(String reactKey) {
+    if (widget.chatMM.reacts == null) {
+      return 0;
+    }
     if (widget.chatMM.reacts!
         .where(
             (react) => react.userId == widget.userId && react.react == reactKey)
@@ -416,6 +528,60 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
     Navigator.pop(context);
   }
 
+  void _showSeeMore(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) => Center(
+        child: Container(
+          width: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Text(
+                  "Tin nhắn",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              optionMore("Ghim", () => null),
+              optionMore(
+                "Chuyển tiếp",
+                () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => ForwardScreen(
+                          chatMM: widget.chatMM, userId: widget.userName),
+                    ),
+                  )
+                },
+              ),
+              optionMore("Nhắc lại", () => null),
+              optionMore(
+                  "Gỡ",
+                  () => {
+                        deleteChatmessage(widget.chatMM.id ?? ""),
+                      }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> deleteChatmessage(String id) async {
+    await chatMessagesViewModel.deleteChatmessage(id);
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
+  }
+
   Widget bottomMenu() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -435,24 +601,23 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
           Icons.copy,
           "Sao chép",
           () {
-            // ignore: avoid_print
-            print("Sao chép");
+            Clipboard.setData(ClipboardData(text: widget.chatMM.text));
+            Navigator.pop(context);
           },
         ),
         option(
-          Icons.push_pin_rounded,
-          "Ghim",
+          Icons.bookmark,
+          "Lưu lại",
           () {
-            // ignore: avoid_print
-            print("Ghim");
+            UserViewModel userViewModel = UserViewModel();
+            userViewModel.addSaved(widget.chatMM.id ?? "");
           },
         ),
         option(
           Icons.more_horiz_rounded,
           "Xem thêm",
           () {
-            // ignore: avoid_print
-            print("Xem thêm");
+            _showSeeMore(context);
           },
         ),
       ],
@@ -477,6 +642,21 @@ class _ReplyMessengerCardState extends State<ReplyMessengerCard> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget optionMore(String text, Function() function) {
+    return TextButton(
+      style: TextButton.styleFrom(
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        foregroundColor: Colors.black,
+        alignment: Alignment.centerLeft,
+        textStyle: const TextStyle(fontSize: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      ),
+      onPressed: function,
+      child: Text(text),
     );
   }
 }

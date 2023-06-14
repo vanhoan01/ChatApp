@@ -12,8 +12,11 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PageViewImages extends StatefulWidget {
-  const PageViewImages(
-      {super.key, required this.chatMessagesList, required this.position});
+  const PageViewImages({
+    super.key,
+    required this.chatMessagesList,
+    required this.position,
+  });
   final List<ChatMessagesModel> chatMessagesList;
   final int position;
 
@@ -147,7 +150,7 @@ class _PageViewImagesState extends State<PageViewImages> {
                     saveInPublicStorage: true,
                   );
                   if (taskId != null) {
-                    showSnack('Ảnh đã được lưu vào thiết bị này!');
+                    showSnack('Đã lưu vào thiết bị');
                   } else {
                     showSnack('Kiểm tra mạng của thiết bị!');
                   }

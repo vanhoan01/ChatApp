@@ -10,6 +10,7 @@ class CameraPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CameraScreen(
       onImageSend: () {},
+      onVideoSend: () {},
     );
   }
 }

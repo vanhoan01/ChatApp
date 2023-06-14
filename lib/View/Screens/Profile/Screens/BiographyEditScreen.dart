@@ -14,7 +14,7 @@ class BiographyEditScreen extends StatefulWidget {
 class _BiographyEditScreenState extends State<BiographyEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _biographyController = TextEditingController();
-  Color colorSave = Colors.white70;
+  Color colorSave = Colors.black87;
   @override
   void initState() {
     super.initState();
@@ -27,23 +27,27 @@ class _BiographyEditScreenState extends State<BiographyEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: TextButton(
           child: const Text(
             "Hủy",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.black),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Center(
             child: Text(
           "Tiểu sử",
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+          ),
         )),
         actions: [
           TextButton(
-            child: Text(
+            child: const Text(
               "Lưu",
-              style: TextStyle(color: colorSave),
+              style: TextStyle(color: Colors.black),
             ),
             onPressed: () {
               if (_biographyController.text != widget.biography) {
@@ -75,8 +79,7 @@ class _BiographyEditScreenState extends State<BiographyEditScreen> {
                 maxLines: 5,
                 decoration: const InputDecoration(
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        width: 1, color: Color.fromRGBO(224, 224, 224, 1)),
+                    borderSide: BorderSide(width: 1, color: Colors.black),
                   ),
                   hintText: 'Nhập tiểu sử',
                 ),
@@ -84,8 +87,8 @@ class _BiographyEditScreenState extends State<BiographyEditScreen> {
                 onChanged: (value) {
                   setState(() {
                     _biographyController.text == widget.biography
-                        ? colorSave = Colors.white70
-                        : colorSave = Colors.white;
+                        ? colorSave = Colors.black87
+                        : colorSave = Colors.black;
                   });
                 },
               ),

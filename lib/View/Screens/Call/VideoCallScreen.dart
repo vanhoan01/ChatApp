@@ -84,10 +84,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     String token = await getToken();
     if (APP_ID.isEmpty) {
       setState(() {
-        _infoStrings.add(
-          'APP_ID missing, please provide your APP_ID in settings.dart',
-        );
-        _infoStrings.add('Agora Engine is not starting');
+        // _infoStrings.add(
+        //   'APP_ID missing, please provide your APP_ID in settings.dart',
+        // );
+        // _infoStrings.add('Agora Engine is not starting');
       });
       return;
     }
@@ -123,34 +123,34 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
       setState(() {
         final info = 'onError: $code';
-        _infoStrings.add(info);
+        // _infoStrings.add(info);
       });
     }, joinChannelSuccess: (channel, uid, elapsed) {
       setState(() {
         final info = 'onJoinChannel: $channel, uid: $uid';
-        _infoStrings.add(info);
+        // _infoStrings.add(info);
       });
     }, leaveChannel: (stats) {
       setState(() {
-        _infoStrings.add('onLeaveChannel');
+        // _infoStrings.add('onLeaveChannel');
         _users.clear();
       });
     }, userJoined: (uid, elapsed) {
       setState(() {
         final info = 'userJoined: $uid';
-        _infoStrings.add(info);
+        // _infoStrings.add(info);
         _users.add(uid);
       });
     }, userOffline: (uid, elapsed) {
       setState(() {
         final info = 'userOffline: $uid';
-        _infoStrings.add(info);
+        // _infoStrings.add(info);
         _users.remove(uid);
       });
     }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
       setState(() {
         final info = 'firstRemoteVideo: $uid ${width}x $height';
-        _infoStrings.add(info);
+        // _infoStrings.add(info);
       });
     }));
   }

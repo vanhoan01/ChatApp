@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-class MessagesTextView extends StatefulWidget {
-  const MessagesTextView({
+class MessagesForwardView extends StatefulWidget {
+  const MessagesForwardView({
     Key? key,
     required this.text,
     required this.reply,
@@ -14,10 +14,10 @@ class MessagesTextView extends StatefulWidget {
   final bool color;
 
   @override
-  State<MessagesTextView> createState() => _MessagesTextViewState();
+  State<MessagesForwardView> createState() => _MessagesForwardViewState();
 }
 
-class _MessagesTextViewState extends State<MessagesTextView> {
+class _MessagesForwardViewState extends State<MessagesForwardView> {
   @override
   Widget build(BuildContext context) {
     return Card(

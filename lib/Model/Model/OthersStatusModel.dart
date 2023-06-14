@@ -7,11 +7,13 @@ part 'OthersStatusModel.g.dart';
 @JsonSerializable()
 class OthersStatusModel {
   OthersStatusModel(
-      {required this.displayName,
+      {required this.userName,
+      required this.displayName,
       this.lastSeenAt,
       required this.avatarImage,
       required this.isGroup,
       required this.precense});
+  final String userName;
   final String displayName;
   final DateTime? lastSeenAt;
   final String avatarImage;

@@ -22,6 +22,7 @@ ChatModel _$ForwardFromJson(Map<String, dynamic> json) => ChatModel.Forward(
       userName: json['userName'] as String,
       displayName: json['displayName'] as String,
       avatarImage: json['avatarImage'] as String,
+      isGroup: json['isGroup'] as bool,
     );
 
 Map<String, dynamic> _$ChatModelToJson(ChatModel instance) => <String, dynamic>{

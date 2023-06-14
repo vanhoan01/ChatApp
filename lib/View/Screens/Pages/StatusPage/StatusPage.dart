@@ -111,6 +111,7 @@ class _StatusPageState extends State<StatusPage>
         msg.forEach((subject) {
           // ... Do something here with items here
           data.add(OthersStatusModel(
+              userName: subject['userName'],
               avatarImage: subject['avatarImage'],
               displayName: subject['displayName'],
               isGroup: subject['isGroup'],

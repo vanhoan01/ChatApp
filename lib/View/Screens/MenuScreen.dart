@@ -7,6 +7,7 @@ import 'package:chatapp/View/Screens/Pages/ProfilePage.dart';
 import 'package:chatapp/ViewModel/UserViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -19,11 +20,13 @@ class _MenuScreenState extends State<MenuScreen> {
   UserViewModel userViewModel = UserViewModel();
   UserModel? userModel;
   final storage = const FlutterSecureStorage();
+  late IO.Socket socket;
 
   @override
   void initState() {
     super.initState();
     getUser();
+    connectSocket();
   }
 
   void getUser() async {
@@ -37,6 +40,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
@@ -54,12 +58,12 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
       body: ListView(children: [
         // UserItem(),
-        OptionItem(Icons.account_tree_outlined, Colors.purple,
-            "Chuyển tài khoản", null, () {}),
-        OptionItem(Icons.circle, Colors.green, "Trạng thái hoạt động",
-            'Đang bật', () {}),
-        OptionItem(Icons.alternate_email_outlined, Colors.red, "Tên người dùng",
-            'm.me/nguyenvanhoan.1201', () {}),
+        // OptionItem(Icons.account_tree_outlined, Colors.purple,
+        //     "Chuyển tài khoản", null, () {}),
+        // OptionItem(Icons.circle, Colors.green, "Trạng thái hoạt động",
+        //     'Đang bật', () {}),
+        // OptionItem(Icons.alternate_email_outlined, Colors.red, "Tên người dùng",
+        //     'm.me/nguyenvanhoan.1201', () {}),
         TitleItem("Tùy chọn"),
         OptionItem(Icons.report_problem, Colors.orange,
             "Báo cáo sự cố kỹ thuật", null, () {}),
@@ -74,11 +78,15 @@ class _MenuScreenState extends State<MenuScreen> {
           null,
           () async {
             await storage.delete(key: "token");
+            socket.emit("disconnect");
             // ignore: use_build_context_synchronously
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (route) => false);
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginScreen(),
+              ),
+              (route) => false,
+            );
           },
         ),
       ]),
@@ -145,6 +153,13 @@ class _MenuScreenState extends State<MenuScreen> {
           : null,
       onTap: funtion,
     );
+  }
+
+  Future<void> connectSocket() async {
+    socket = IO.io(AppUrl.baseUrl, <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
   }
 
   // ignore: non_constant_identifier_names

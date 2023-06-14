@@ -8,10 +8,12 @@ class MessagesFileView extends StatefulWidget {
     required this.name,
     required this.size,
     this.reply,
+    required this.color,
   }) : super(key: key);
   final String name;
   final int size;
   final bool? reply;
+  final bool color;
 
   @override
   State<MessagesFileView> createState() => _MessagesFileViewState();
@@ -21,19 +23,24 @@ class _MessagesFileViewState extends State<MessagesFileView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.reply == null
-          ? const Color(0xffdcf8c6)
-          : widget.reply == false
-              ? const Color(0xffdcf8c6)
-              : Colors.grey.shade200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: widget.color ? Colors.blue : Colors.grey.shade200,
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: ListTile(
         leading: const CircleAvatar(
           backgroundColor: Color.fromRGBO(238, 238, 238, 1),
           child: Icon(Icons.file_present),
         ),
-        title: Text(widget.name),
-        subtitle: Text('${widget.size}'),
+        title: Text(widget.name,
+            style: TextStyle(
+              color: widget.color ? Colors.white : Colors.black,
+            )),
+        subtitle: Text('${widget.size}',
+            style: TextStyle(
+              color: widget.color ? Colors.white : Colors.black,
+            )),
       ),
     );
   }

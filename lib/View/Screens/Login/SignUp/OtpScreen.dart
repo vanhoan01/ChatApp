@@ -26,14 +26,14 @@ class _OtpScreenState extends State<OtpScreen> {
         title: Text(
           "Verify ${widget.countryCode} ${widget.number}",
           style: TextStyle(
-            color: Colors.teal[800],
+            color: Colors.blue[800],
             fontSize: 16.5,
           ),
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.more_vert,
               color: Colors.black,
             ),
@@ -43,17 +43,17 @@ class _OtpScreenState extends State<OtpScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(horizontal: 35),
+        padding: const EdgeInsets.symmetric(horizontal: 35),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
                 children: [
-                  TextSpan(
+                  const TextSpan(
                     text: "Chúng tôi đã gửi một tin nhắn SMS có mã đến ",
                     style: TextStyle(
                       color: Colors.black,
@@ -62,7 +62,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                   TextSpan(
                     text: "${widget.countryCode} ${widget.number}",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 14.5,
                       fontWeight: FontWeight.bold,
@@ -71,14 +71,14 @@ class _OtpScreenState extends State<OtpScreen> {
                   TextSpan(
                     text: " Sai số?",
                     style: TextStyle(
-                      color: Colors.cyan[800],
+                      color: Colors.blue[800],
                       fontSize: 14.5,
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 5,
             ),
             OTPTextField(
@@ -86,11 +86,12 @@ class _OtpScreenState extends State<OtpScreen> {
               length: 6,
               width: MediaQuery.of(context).size.width,
               fieldWidth: 30,
-              style: TextStyle(fontSize: 17),
+              style: const TextStyle(fontSize: 17),
               textFieldAlignment: MainAxisAlignment.spaceAround,
               fieldStyle: FieldStyle.underline,
               onChanged: (pin) {
-                print("Changed: " + pin);
+                // ignore: avoid_print
+                print("Changed: $pin");
               },
               onCompleted: (pin) {
                 //EnterInformation
@@ -103,7 +104,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 );
               },
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             Text(
@@ -113,17 +114,17 @@ class _OtpScreenState extends State<OtpScreen> {
                 fontSize: 14,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             bottomButton("Gửi lại tin nhắn SMS", Icons.message),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
-            Divider(
+            const Divider(
               thickness: 1.5,
             ),
-            SizedBox(
+            const SizedBox(
               height: 12,
             ),
             bottomButton("Gọi cho tôi", Icons.call),
@@ -138,16 +139,16 @@ class _OtpScreenState extends State<OtpScreen> {
       children: [
         Icon(
           icon,
-          color: Colors.teal,
+          color: Colors.blue,
           size: 24,
         ),
-        SizedBox(
+        const SizedBox(
           width: 25,
         ),
         Text(
           text,
           style: TextStyle(
-            color: Colors.cyan[800],
+            color: Colors.blue[800],
             fontSize: 14.5,
           ),
         ),

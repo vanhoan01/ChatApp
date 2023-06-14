@@ -3,9 +3,10 @@ class TextTimeVM {
     required this.time,
   });
 
-  final DateTime time;
+  DateTime time;
 
   String getTextTime() {
+    time = time.toLocal();
     DateTime now = DateTime.now();
     String timetext = "";
     List<String> dayweek = [
@@ -38,6 +39,7 @@ class TextTimeVM {
   }
 
   String getTextChatTime() {
+    time = time.toLocal();
     DateTime now = DateTime.now();
     String timetext = "";
     List<String> dayweek = [

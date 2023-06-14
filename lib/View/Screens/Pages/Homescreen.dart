@@ -2,8 +2,6 @@
 
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/Resources/app_urls.dart';
-import 'package:chatapp/View/Navigation/NavigationService.dart';
-import 'package:chatapp/View/Screens/Call/VideoCallScreen.dart';
 import 'package:chatapp/View/Screens/Pages/CallPage.dart';
 import 'package:chatapp/View/Screens/Pages/ChatPage.dart';
 import 'package:chatapp/View/Screens/Pages/StatusPage/StatusPage.dart';
@@ -27,7 +25,7 @@ class _HomescreenState extends State<Homescreen>
 
   @override
   void initState() {
-    // connectSocket();
+    connectSocket();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 4, vsync: this, initialIndex: 0);
@@ -47,6 +45,7 @@ class _HomescreenState extends State<Homescreen>
         child: TabBar(
           controller: _tabController,
           indicatorColor: Colors.black,
+          labelColor: Colors.black,
           unselectedLabelColor: Colors.grey.shade600,
           labelPadding: const EdgeInsets.all(2),
           tabs: [
@@ -93,26 +92,6 @@ class _HomescreenState extends State<Homescreen>
       "transports": ["websocket"],
       "autoConnect": false,
     });
-    // ignore: await_only_futures
-    socket.connect();
     socket.emit("signin", userModel.userName);
-    socket.onConnect((data) {
-      // ignore: avoid_print
-      print("Connected");
-      socket.on("calling", (msg) {
-        // ignore: avoid_print
-        print("Nhận cuộc gọi: ${msg[0]}");
-        Navigator.push(
-          NavigationService.instance.navigationKey.currentContext ?? context,
-          MaterialPageRoute(
-            builder: (context) => VideoCallScreen(
-              caller: msg[1],
-              creceiver: msg[0],
-              callStatus: false,
-            ),
-          ),
-        );
-      });
-    });
   }
 }

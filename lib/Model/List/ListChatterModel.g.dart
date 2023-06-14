@@ -13,6 +13,13 @@ ListChatterModel _$ListChatterModelFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
+ListChatterModel _$ListChatterModelFromJsonSearch(Map<String, dynamic> json) =>
+    ListChatterModel(
+      data: (json['data'] as List<dynamic>?)
+          ?.map((e) => ChatterModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
 Map<String, dynamic> _$ListChatterModelToJson(ListChatterModel instance) =>
     <String, dynamic>{
       'data': instance.data,

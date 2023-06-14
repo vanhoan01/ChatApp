@@ -10,9 +10,11 @@ class MessagesImageView extends StatefulWidget {
     Key? key,
     required this.path,
     required this.reply,
+    required this.color,
   }) : super(key: key);
   final String path;
   final bool reply;
+  final bool color;
 
   @override
   State<MessagesImageView> createState() => _MessagesImageViewState();
@@ -22,9 +24,10 @@ class _MessagesImageViewState extends State<MessagesImageView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.reply == false
-          ? const Color(0xffdcf8c6)
-          : Colors.grey.shade200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: widget.color ? Colors.blue : Colors.grey.shade200,
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         mainAxisSize: MainAxisSize.min,

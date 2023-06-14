@@ -34,10 +34,12 @@ class ChatModel {
     required this.status,
     this.select = false,
   });
+  // ignore: non_constant_identifier_names
   ChatModel.Forward({
     required this.userName,
     required this.displayName,
     required this.avatarImage,
+    required this.isGroup,
   });
 
   factory ChatModel.fromJson(Map<String, dynamic> json) =>

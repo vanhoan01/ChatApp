@@ -34,6 +34,13 @@ class _NewGroupState extends State<NewGroup> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,15 +48,13 @@ class _NewGroupState extends State<NewGroup> {
             Text(
               'Nhóm mới',
               style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
             Text(
               'Thêm tiêu đề',
-              style: TextStyle(
-                fontSize: 13,
-              ),
+              style: TextStyle(fontSize: 13, color: Colors.black),
             ),
           ],
         ),
@@ -101,7 +106,7 @@ class _NewGroupState extends State<NewGroup> {
         onPressed: () {
           addConversation();
         },
-        backgroundColor: const Color(0xFF128C7E),
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.check),
       ),
     );
@@ -124,7 +129,7 @@ class _NewGroupState extends State<NewGroup> {
           return null;
         },
         decoration: InputDecoration(
-          hintStyle: const TextStyle(color: Colors.teal),
+          hintStyle: const TextStyle(color: Colors.grey),
           hintText: "Tiêu đề nhóm",
           counterText: "",
           prefixIcon: Padding(
@@ -132,7 +137,7 @@ class _NewGroupState extends State<NewGroup> {
             child: InkWell(
               onTap: takeCoverPhoto,
               child: CircleAvatar(
-                backgroundColor: Colors.teal,
+                backgroundColor: Colors.blue,
                 child: Icon(
                   iconphoto,
                   color: Colors.white,

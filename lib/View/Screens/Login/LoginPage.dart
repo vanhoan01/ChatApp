@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text(
           "Nhập số điện thoại của bạn",
           style: TextStyle(
-            color: Colors.teal,
+            color: Colors.blue,
             fontWeight: FontWeight.w700,
             fontSize: 18,
             wordSpacing: 1,
@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
               "Số của bạn là gì?",
               style: TextStyle(
                 fontSize: 12.8,
-                color: Colors.cyan[800],
+                color: Colors.blue.shade700,
               ),
             ),
             const SizedBox(height: 15),
@@ -68,13 +68,16 @@ class _LoginPageState extends State<LoginPage> {
                 }
               },
               child: Container(
-                color: Colors.tealAccent[400],
+                color: Colors.blue,
                 height: 40,
                 width: 70,
                 child: const Center(
                   child: Text(
                     "TIẾP",
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -101,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
         decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: Colors.teal,
+              color: Colors.blue,
               width: 1.8,
             ),
           ),
@@ -120,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const Icon(
               Icons.arrow_drop_down,
-              color: Colors.teal,
+              color: Colors.blue,
               size: 28,
             ),
           ],
@@ -141,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.teal,
+                  color: Colors.blue,
                   width: 1.8,
                 ),
               ),
@@ -166,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.teal,
+                  color: Colors.blue,
                   width: 1.6,
                 ),
               ),
@@ -216,12 +219,16 @@ class _LoginPageState extends State<LoginPage> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 10),
                 const Text(
                   "Điều này có ổn không, hoặc bạn muốn chỉnh sửa số?",
-                  style: TextStyle(fontSize: 13.5),
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
@@ -231,7 +238,12 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Edit"),
+              child: const Text(
+                "Chỉnh sửa",
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () async {
@@ -255,7 +267,12 @@ class _LoginPageState extends State<LoginPage> {
                               )));
                 }
               },
-              child: const Text("Ok"),
+              child: const Text(
+                "Ok",
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
             ),
           ],
         );
@@ -266,7 +283,12 @@ class _LoginPageState extends State<LoginPage> {
   showAlertDialogCheck(BuildContext context) {
     // set up the button
     Widget okButton = TextButton(
-      child: const Text("OK"),
+      child: const Text(
+        "OK",
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
       onPressed: () {
         Navigator.pop(context);
         Navigator.pop(context);
@@ -313,7 +335,7 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text("Ok"),
+              child: const Text("OK"),
             ),
           ],
         );

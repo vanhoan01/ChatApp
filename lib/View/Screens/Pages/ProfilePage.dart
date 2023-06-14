@@ -206,6 +206,7 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget OptionItem(IconData iconData, String title) {
     return ListTile(
       leading: Icon(

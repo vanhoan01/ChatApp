@@ -1,6 +1,8 @@
 // ignore_for_file: file_names
 
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/Model/List/ListSearchModel.dart';
+import 'package:chatapp/Model/Model/SearchModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/ViewModel/Image/ImageViewModel.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -25,6 +27,19 @@ class UserViewModel {
     return userModel!;
   }
 
+  Future<List<SearchModel>?> getSuggestionsSearch() async {
+    List<SearchModel>? listSearch = [];
+    try {
+      var response = await networkHandler.get("/user/suggestionssearch");
+      ListSearchModel listSearchModel = ListSearchModel.fromJson(response);
+      listSearch = listSearchModel.data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listSearch!;
+  }
+
   Future<bool> checkPhoneNumber(String phoneNumber) async {
     try {
       var body = await networkHandler
@@ -32,6 +47,19 @@ class UserViewModel {
       // ignore: avoid_print
       print('responsePD: $body');
       bool check = body['status'];
+      return check;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  Future<bool> checkrelationship(String userName) async {
+    try {
+      var body = await networkHandler.get("/user/checkrelationship/$userName");
+      // ignore: avoid_print
+      print('responsePD: $body');
+      bool check = body['status'];
+      print(check);
       return check;
     } catch (e) {
       return true;
@@ -83,6 +111,28 @@ class UserViewModel {
       print(e);
     }
     return relation!;
+  }
+
+  Future<Response> addRelationship(
+      String myUserName, String otherUserName, String relationship) async {
+    var body = {
+      "userName": myUserName,
+      "relationship": {"userName": otherUserName, "typeStatus": relationship}
+    };
+    var res = await networkHandler.post1("/user/add/relationship", body);
+    return res;
+  }
+
+  Future<Response> updateRelationship(
+      String myUserName, String otherUserName, String relationship) async {
+    var body = {
+      "userName": myUserName,
+      "relationship": {"userName": otherUserName, "typeStatus": relationship}
+    };
+    var responseUD =
+        await networkHandler.post1("/user/update/relationship", body);
+    // ignore: avoid_print
+    return responseUD;
   }
 
   Future<void> updateDisplayName(String displayName) async {

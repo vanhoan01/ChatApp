@@ -1,16 +1,12 @@
 // ignore_for_file: file_names
 
 import 'dart:convert';
-
 import 'package:chatapp/Data/Services/network_handler.dart';
-import 'package:chatapp/Model/List/ListCallModel.dart';
 import 'package:chatapp/Model/List/ListChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/CallModel.dart';
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ChatterModel.dart';
-import 'package:chatapp/Model/Model/userModel.dart';
 import 'package:chatapp/ViewModel/ChatterViewModel.dart';
-import 'package:chatapp/ViewModel/UserViewModel.dart';
 
 class ChatMessagesViewModel {
   NetworkHandler networkHandler = NetworkHandler();
@@ -27,6 +23,19 @@ class ChatMessagesViewModel {
       'timestamp': timestamp.toString(),
       "reply": reply ?? "",
     };
+
+    try {
+      var response = await networkHandler.post1("/chatmessage/add", body);
+      id = json.decode(response.body)['data'];
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return id;
+  }
+
+  Future<String> addChatMessageWithBody(var body) async {
+    String id = "";
 
     try {
       var response = await networkHandler.post1("/chatmessage/add", body);
@@ -106,6 +115,19 @@ class ChatMessagesViewModel {
     return listChatMessagesModel!;
   }
 
+  Future<List<ChatMessagesModel>> getOtherPhotos(String userName) async {
+    List<ChatMessagesModel>? listChatMessagesModel = [];
+    try {
+      var resMessage =
+          await networkHandler.get("/chatmessage/get/otherphotos/$userName");
+      listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listChatMessagesModel!;
+  }
+
   Future<List<CallModel>> getCalls() async {
     List<CallModel>? listCallModel = [];
     try {
@@ -135,6 +157,19 @@ class ChatMessagesViewModel {
     List<ChatMessagesModel>? listChatMessagesModel = [];
     try {
       var resMessage = await networkHandler.get("/chatmessage/get/files");
+      listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return listChatMessagesModel!;
+  }
+
+  Future<List<ChatMessagesModel>> getOtherFiles(String userName) async {
+    List<ChatMessagesModel>? listChatMessagesModel = [];
+    try {
+      var resMessage =
+          await networkHandler.get("/chatmessage/get/otherfiles/$userName");
       listChatMessagesModel = ListChatMessagesModel.fromJson(resMessage).data;
     } catch (e) {
       // ignore: avoid_print

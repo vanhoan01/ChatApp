@@ -4,13 +4,16 @@ import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:chatapp/Model/List/ListChatterModel.dart';
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ChatModel.dart';
+import 'package:chatapp/Model/Model/SearchModel.dart';
 import 'package:chatapp/View/Components/Conversation/ForwardItem.dart';
 import 'package:chatapp/View/Components/CustomUI/SearchItem.dart';
+import 'package:chatapp/ViewModel/UserViewModel.dart';
 import 'package:flutter/material.dart';
 
 enum _SearchBody {
   suggestions,
   results,
+  goiy,
 }
 
 class ForwardScreen<T> extends StatefulWidget {
@@ -40,6 +43,8 @@ class ForwardScreenState<T> extends State<ForwardScreen<T>> {
   String query = '';
   TextInputAction? textInputAction;
   TextInputType? keyboardType;
+  UserViewModel userViewModel = UserViewModel();
+  List<SearchModel>? searchModelGoiY;
 
   @override
   void initState() {
@@ -49,13 +54,13 @@ class ForwardScreenState<T> extends State<ForwardScreen<T>> {
     _currentBodyNotifier.addListener(_onSearchBodyChanged);
     focusNode.addListener(_onFocusChanged);
     _focusNode = focusNode;
+    _currentBody = _SearchBody.goiy;
   }
 
   @override
   void dispose() {
     super.dispose();
     _queryTextController.removeListener(_onQueryChanged);
-
     _currentBodyNotifier.removeListener(_onSearchBodyChanged);
     _focusNode = null;
     focusNode.dispose();
@@ -108,18 +113,36 @@ class ForwardScreenState<T> extends State<ForwardScreen<T>> {
     assert(theme != null);
     return theme.copyWith(
       appBarTheme: AppBarTheme(
+          // ignore: deprecated_member_use
           brightness: colorScheme.brightness,
           backgroundColor: colorScheme.brightness == Brightness.dark
               ? Colors.grey[900]
               : Colors.white,
           iconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
-          textTheme: theme.textTheme,
-          surfaceTintColor: Colors.black),
+          surfaceTintColor: Colors.black,
+          toolbarTextStyle: theme.textTheme.bodyText2,
+          titleTextStyle: theme.textTheme.headline6),
       inputDecorationTheme: searchFieldDecorationTheme ??
           InputDecorationTheme(
             hintStyle: searchFieldStyle ?? theme.inputDecorationTheme.hintStyle,
             border: InputBorder.none,
           ),
+    );
+  }
+
+  Widget buildGoiY(BuildContext context) {
+    fetchData2();
+    return ListView.builder(
+      itemCount: searchModelGoiY == null ? 0 : searchModelGoiY!.length,
+      itemBuilder: (context, index) {
+        SearchModel searchModel = searchModelGoiY![index];
+        // return Container();
+        return ForwardItem(
+          chatModel: searchModel,
+          chatMMId: widget.chatMM.id ?? "",
+          userName: widget.userId,
+        );
+      },
     );
   }
 
@@ -135,13 +158,22 @@ class ForwardScreenState<T> extends State<ForwardScreen<T>> {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         ChatModel chatModel = matchQuery[index];
-        return ForwardItem(
-          chatModel: chatModel,
-          chatMMId: widget.chatMM.id ?? "",
-          userName: widget.userId,
-        );
+        return Container();
+        // return ForwardItem(
+        //   chatModel: chatModel,
+        //   chatMMId: widget.chatMM.id ?? "",
+        //   userName: widget.userId,
+        // );
       },
     );
+  }
+
+  Future fetchData2() async {
+    List<SearchModel>? searchModelList =
+        await userViewModel.getSuggestionsSearch();
+    setState(() {
+      searchModelGoiY = searchModelList;
+    });
   }
 
   Future fetchData(String query) async {
@@ -207,11 +239,12 @@ class ForwardScreenState<T> extends State<ForwardScreen<T>> {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         ChatModel chatModel = matchQuery[index];
-        return ForwardItem(
-          chatModel: chatModel,
-          chatMMId: widget.chatMM.id ?? "",
-          userName: widget.userId,
-        );
+        return Container();
+        // return ForwardItem(
+        //   chatModel: chatModel,
+        //   chatMMId: widget.chatMM.id ?? "",
+        //   userName: widget.userId,
+        // );
       },
     );
   }
@@ -251,6 +284,12 @@ class ForwardScreenState<T> extends State<ForwardScreen<T>> {
         body = KeyedSubtree(
           key: const ValueKey<_SearchBody>(_SearchBody.results),
           child: buildResults(context),
+        );
+        break;
+      case _SearchBody.goiy:
+        body = KeyedSubtree(
+          key: const ValueKey<_SearchBody>(_SearchBody.results),
+          child: buildGoiY(context),
         );
         break;
       case null:

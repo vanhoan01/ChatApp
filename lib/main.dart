@@ -357,24 +357,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        fontFamily: 'OpenSans',
-        primaryColor: Colors.white,
-        // const Color(0xFF075E54),
-        colorScheme: const ColorScheme(
-          brightness: Brightness.light,
-          primary: Colors.white,
-          onPrimary: Colors.white,
-          secondary: Color(0xFF128C7E),
-          onSecondary: Colors.white,
-          background: Colors.white,
-          onBackground: Colors.white,
-          surface: Colors.white,
-          onSurface: Colors.white,
-          error: Colors.white,
-          onError: Colors.white,
-        ),
-      ),
+      // theme: ThemeData(
+      //   // fontFamily: 'OpenSans',
+      //   primaryColor: const Color.fromARGB(255, 3, 200, 195),
+
+      //   // const Color(0xFF075E54),
+      //   colorScheme: Theme.of(context).colorScheme.copyWith(
+      //         primary: const Color.fromARGB(255, 3, 200, 195),
+      //         // secondary: Color(0xFF00f2ea)
+      //       ),
+      // ),
       home: page,
       navigatorKey: NavigationService.instance.navigationKey,
       navigatorObservers: <NavigatorObserver>[
@@ -403,14 +395,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       actions: <AndroidNotificationAction>[
         AndroidNotificationAction(
           urlLaunchActionId,
-          'Action 1',
-          icon: DrawableResourceAndroidBitmap('food'),
+          'Kết thúc',
+          // icon: DrawableResourceAndroidBitmap('food'),
+          icon: DrawableResourceAndroidBitmap('end_call'),
           contextual: true,
         ),
         AndroidNotificationAction(
           navigationActionId,
-          'Action 3',
-          icon: DrawableResourceAndroidBitmap('secondary_icon'),
+          'Chấp nhận',
+          icon: DrawableResourceAndroidBitmap('accept_call'),
           showsUserInterface: true,
           // By default, Android plugin will dismiss the notification when the
           // user tapped on a action (this mimics the behavior on iOS).
@@ -449,9 +442,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       macOS: macOSNotificationDetails,
       linux: linuxNotificationDetails,
     );
-    await flutterLocalNotificationsPlugin.show(
-        id++, 'plain title', 'plain body', notificationDetails,
-        payload: 'item z');
+    await flutterLocalNotificationsPlugin
+        .show(id++, 'Cuộc gọi đến', '', notificationDetails, payload: 'item z');
   }
 }
 // flutter pub run build_runner build

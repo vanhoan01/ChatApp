@@ -8,6 +8,9 @@ part of 'OthersStatusModel.dart';
 
 OthersStatusModel _$OthersStatusModelFromJson(Map<String, dynamic> json) =>
     OthersStatusModel(
+      userName: json['userName'] == null
+          ? json['_id'] as String
+          : json['userName'] as String,
       displayName: json['displayName'] as String,
       avatarImage:
           json['avatarImage'] == null ? "" : json['avatarImage'] as String,

@@ -5,14 +5,17 @@ import 'package:chatapp/Model/List/ListChatterModel.dart';
 import 'package:chatapp/Model/List/ListConversationModel.dart';
 import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
+import 'package:chatapp/Resources/app_urls.dart';
 import 'package:chatapp/View/Components/CustomUI/CustomCard.dart';
 import 'package:chatapp/View/Screens/Camera/CameraPage.dart';
+import 'package:chatapp/View/Screens/Group/SelectContact.dart';
 import 'package:chatapp/View/Screens/Login/LoginScreen.dart';
 import 'package:chatapp/View/Screens/SearchScreen.dart';
-import 'package:chatapp/View/Screens/SelectContact.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/ViewModel/UserViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatPage extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
@@ -31,6 +34,8 @@ class _ChatPageState extends State<ChatPage> {
   late final String url;
   List<ChatModel> chatmodels = [];
   final storage = const FlutterSecureStorage();
+  bool loading = true;
+  late IO.Socket socket;
 
   @override
   void initState() {
@@ -109,6 +114,7 @@ class _ChatPageState extends State<ChatPage> {
     UserModel userModel = UserModel.fromJson(responseUser);
     // ignore: avoid_print
     print(userModel);
+    // await connectSocket(userModel.userName);
     setState(() {
       chatmodels = chatModelChatterConversation;
       sourceChat = ChatModel(
@@ -119,7 +125,18 @@ class _ChatPageState extends State<ChatPage> {
           isGroup: false,
           timestamp: DateTime.parse('2023-01-01'),
           currentMessage: '');
+      loading = false;
     });
+  }
+
+  Future<void> connectSocket(String userName) async {
+    // UserViewModel userViewModel = UserViewModel();
+    // UserModel userModel = await userViewModel.getUserModel();
+    socket = IO.io(AppUrl.baseUrl, <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
+    socket.emit("signin", userName);
   }
 
   @override
@@ -219,13 +236,17 @@ class _ChatPageState extends State<ChatPage> {
           // ),
         ],
       ),
-      body: chatmodels.isNotEmpty
-          ? ListView.builder(
-              itemBuilder: (context, index) =>
-                  CustomCard(chatModel: chatmodels[index]),
-              itemCount: chatmodels.length,
+      body: loading
+          ? const Center(
+              child: CircularProgressIndicator(),
             )
-          : invite_friends(),
+          : chatmodels.isNotEmpty
+              ? ListView.builder(
+                  itemBuilder: (context, index) =>
+                      CustomCard(chatModel: chatmodels[index]),
+                  itemCount: chatmodels.length,
+                )
+              : invite_friends(),
     );
   }
 

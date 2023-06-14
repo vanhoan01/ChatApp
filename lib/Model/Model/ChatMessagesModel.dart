@@ -26,11 +26,11 @@ class ChatMessagesModel {
   final String? partition;
   final String? avatarAuthor;
   final bool? isGroup;
-  final String type;
+  late final String type;
   final String text;
   final int? size;
   final DateTime timestamp;
-  final List<ReactModel>? reacts;
+  late List<ReactModel>? reacts;
   final String? reply;
 
   factory ChatMessagesModel.fromJson(Map<String, dynamic> json) =>

@@ -41,10 +41,16 @@ class _ProfileEditState extends State<ProfileEdit> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text("Sửa hồ sơ"),
+        title: const Text(
+          "Sửa hồ sơ",
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

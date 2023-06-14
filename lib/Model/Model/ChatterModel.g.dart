@@ -14,6 +14,8 @@ ChatterModel _$ChatterModelFromJson(Map<String, dynamic> json) => ChatterModel(
       lastSeenAt: json['lastSeenAt'] == null
           ? null
           : DateTime.parse(json['lastSeenAt'] as String),
+      link: json['link'] as String?,
+      biography: json['biography'] as String?,
       precense: json['precense'] as String?,
     );
 
@@ -24,5 +26,7 @@ Map<String, dynamic> _$ChatterModelToJson(ChatterModel instance) =>
       'displayName': instance.displayName,
       'avatarImage': instance.avatarImage,
       'lastSeenAt': instance.lastSeenAt?.toIso8601String(),
+      'link': instance.link,
+      'biography': instance.biography,
       'precense': instance.precense,
     };

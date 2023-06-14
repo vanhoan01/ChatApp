@@ -2,18 +2,19 @@
 
 import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
+import 'package:chatapp/Model/Model/SearchModel.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ForwardItem extends StatefulWidget {
-  const ForwardItem(
-      {Key? key,
-      required this.chatModel,
-      required this.userName,
-      required this.chatMMId})
-      : super(key: key);
-  final ChatModel chatModel;
+  const ForwardItem({
+    Key? key,
+    required this.chatModel,
+    required this.userName,
+    required this.chatMMId,
+  }) : super(key: key);
+  final SearchModel chatModel;
   final String userName;
   final String chatMMId;
 
@@ -31,9 +32,9 @@ class _ForwardItemState extends State<ForwardItem> {
       widget.chatModel.userName,
       widget.chatModel.isGroup,
       "Forward",
-      "",
-      DateTime.now(),
       widget.chatMMId,
+      DateTime.now(),
+      "",
     );
     // ignore: avoid_print
     print("id: $id");
@@ -73,7 +74,7 @@ class _ForwardItemState extends State<ForwardItem> {
         ),
       ),
       subtitle: Text(
-        widget.chatModel.currentMessage,
+        widget.chatModel.status ?? "",
         style: const TextStyle(
           fontSize: 13,
         ),

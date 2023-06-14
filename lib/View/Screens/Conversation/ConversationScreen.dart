@@ -7,8 +7,13 @@ import 'package:chatapp/Model/List/ListChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ChatMessagesModel.dart';
 import 'package:chatapp/Model/Model/ChatModel.dart';
 import 'package:chatapp/Model/Model/userModel.dart';
+import 'package:chatapp/Resources/app_urls.dart';
+import 'package:chatapp/Resources/friend.dart';
+import 'package:chatapp/View/Components/ChatMessages/Compoments/NotificationView.dart';
 import 'package:chatapp/View/Components/ChatMessages/OwnMessageCard.dart';
 import 'package:chatapp/View/Components/ChatMessages/ReplyMessengerCard.dart';
+import 'package:chatapp/View/Screens/Camera/VideoViewPage.dart';
+// import 'package:chatapp/View/Navigation/NavigationService.dart';
 import 'package:chatapp/View/Screens/ChatPage/Screens/LocationShareMap.dart';
 import 'package:chatapp/View/Screens/Call/VideoCallScreen.dart';
 import 'package:chatapp/View/Screens/Camera/CameraScreen.dart';
@@ -16,10 +21,13 @@ import 'package:chatapp/View/Screens/Camera/CameraViewPage.dart';
 import 'package:chatapp/View/Screens/Pages/Homescreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:chatapp/View/Screens/InformationUser/InformationUser.dart';
+import 'package:chatapp/View/Screens/Profile/GroupProfileScreen.dart';
+import 'package:chatapp/View/Screens/Profile/OtherProfileScreen.dart';
 import 'package:chatapp/ViewModel/ChatPage/ChatMessagesViewModel.dart';
 import 'package:chatapp/ViewModel/File/AudioViewModel.dart';
 import 'package:chatapp/ViewModel/File/FileViewModel.dart';
 import 'package:chatapp/ViewModel/UserViewModel.dart';
+import 'package:chatapp/ViewModel/VideoViewModel.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +57,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final ImagePicker _picker = ImagePicker();
   late XFile file;
   int popTime = 0;
-  late String relationship = "Bạn bè";
+  late String relationship = Friend.banBe;
   NetworkHandler networkHandler = NetworkHandler();
   late String _url = "";
   ListChatMessagesModel listChatMessagesModel = ListChatMessagesModel();
@@ -58,17 +66,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
   List<File>? files;
   UserViewModel userViewModel = UserViewModel();
   final ChatMessagesViewModel _chatMessagesViewModel = ChatMessagesViewModel();
+  bool loading = true;
 
   // final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
-    _url = networkHandler.getURL();
-    fetchData();
     super.initState();
 
     // connect();
-
+    _url = networkHandler.getURL();
+    fetchData();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -103,6 +111,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               leadingWidth: 70,
+              backgroundColor: Colors.white,
               titleSpacing: 0,
               leading: InkWell(
                 onTap: () {
@@ -165,10 +174,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ],
                       ),
                       const SizedBox(width: 5),
-                      relationship == "Bạn bè" ||
-                              widget.chatModel.isGroup == true
-                          ? Container()
-                          : ketBan(),
                     ],
                   ),
                 ),
@@ -198,12 +203,32 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => InformationUser(
-                            userName: widget.chatModel.userName,
-                            avatarImage: widget.chatModel.avatarImage,
-                            displayName: widget.chatModel.displayName),
+                        builder: (builder) => widget.chatModel.isGroup
+                            ? GroupProfileScreen(
+                                id: widget.chatModel.userName,
+                                myUserName: sourceChat == null
+                                    ? ""
+                                    : sourceChat!.userName)
+                            : OtherProfileScreen(
+                                userName: widget.chatModel.userName,
+                                myUserName: sourceChat == null
+                                    ? ""
+                                    : sourceChat!.userName),
                       ),
                     );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => InformationUser(
+                    //       userName: widget.chatModel.userName,
+                    //       avatarImage: widget.chatModel.avatarImage,
+                    //       displayName: widget.chatModel.displayName,
+                    //       isGroup: widget.chatModel.isGroup,
+                    //       myUserName:
+                    //           sourceChat == null ? "" : sourceChat!.userName,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   icon: const Icon(Icons.info, color: Colors.black),
                 ),
@@ -215,47 +240,65 @@ class _ConversationScreenState extends State<ConversationScreen> {
               child: WillPopScope(
                 child: Column(
                   children: [
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        reverse: true,
-                        padding: const EdgeInsets.only(bottom: 10),
-                        // controller: _scrollController,
-                        itemCount: messages.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == messages.length) {
-                            return Container(
-                              height: 70,
-                            );
-                          }
-                          if (messages[index].author == sourceChat!.userName) {
-                            return OwnMessageCard(
-                              chatMM: messages[index],
-                              timeAfter: index < messages.length - 1
-                                  ? messages[index + 1].timestamp
-                                  : DateTime.parse('2020-01-01'),
-                              userId: sourceChat != null
-                                  ? sourceChat!.id ?? ""
-                                  : "",
-                              setReply: setReply,
-                              userName: sourceChat != null
-                                  ? sourceChat!.userName
-                                  : "",
-                            );
-                          } else {
-                            return ReplyMessengerCard(
-                                userId: sourceChat != null
-                                    ? sourceChat!.id ?? ""
-                                    : "",
-                                chatMM: messages[index],
-                                timeAfter: index < messages.length - 1
-                                    ? messages[index + 1].timestamp
-                                    : DateTime.parse('2010-01-01'),
-                                setReply: setReply);
-                          }
-                        },
-                      ),
-                    ),
+                    relationship == Friend.banBe ||
+                            widget.chatModel.isGroup == true
+                        ? Container()
+                        : ketBan(),
+                    loading
+                        ? const Expanded(
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : Expanded(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              reverse: true,
+                              padding: const EdgeInsets.only(bottom: 10),
+                              // controller: _scrollController,
+                              itemCount: messages.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index == messages.length) {
+                                  return Container(
+                                    height: 70,
+                                  );
+                                }
+                                if (messages[index].type == "Notification") {
+                                  return NotificationView(
+                                      text: messages[index].text);
+                                } else if (messages[index].author ==
+                                    sourceChat!.userName) {
+                                  return OwnMessageCard(
+                                    chatMM: messages[index],
+                                    timeAfter: index < messages.length - 1
+                                        ? messages[index + 1].timestamp
+                                        : DateTime.parse('2020-01-01'),
+                                    userId: sourceChat != null
+                                        ? sourceChat!.id ?? ""
+                                        : "",
+                                    setReply: setReply,
+                                    userName: sourceChat != null
+                                        ? sourceChat!.userName
+                                        : "",
+                                  );
+                                } else {
+                                  return ReplyMessengerCard(
+                                    userId: sourceChat != null
+                                        ? sourceChat!.id ?? ""
+                                        : "",
+                                    chatMM: messages[index],
+                                    timeAfter: index < messages.length - 1
+                                        ? messages[index + 1].timestamp
+                                        : DateTime.parse('2010-01-01'),
+                                    setReply: setReply,
+                                    userName: sourceChat != null
+                                        ? sourceChat!.userName
+                                        : "",
+                                  );
+                                }
+                              },
+                            ),
+                          ),
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Column(
@@ -399,6 +442,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                             CameraScreen(
                                                           onImageSend:
                                                               onImageSend,
+                                                          onVideoSend:
+                                                              onVideoSend,
                                                         ),
                                                       ),
                                                     );
@@ -417,8 +462,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                           bottom: 8, right: 5, left: 2),
                                       child: CircleAvatar(
                                         radius: 25,
-                                        backgroundColor:
-                                            const Color(0xFF128C7E),
+                                        backgroundColor: Colors.blue,
                                         child: IconButton(
                                           onPressed: () {
                                             if (sendButton) {
@@ -520,65 +564,37 @@ class _ConversationScreenState extends State<ConversationScreen> {
     setState(() {
       messages = chatMessagesList!;
       relationship = relation.toString();
+      loading = false;
     });
 
-    connect();
+    await connect();
   }
 
   Future<void> connect() async {
-    socket = IO.io(_url, <String, dynamic>{
+    socket = IO.io(AppUrl.baseUrl, <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
     });
-    // ignore: await_only_futures
-
-    if (socket.active == false) {
+    socket.on("message", (msg) {
       // ignore: avoid_print
-      print("Connecting");
-      // ignore: await_only_futures
-      // await socket.connect();
-      // socket.emit("signin", sourceChat!.userName);
-    }
-    // socket.emit("signin", sourceChat!.userName);
-    socket.onConnect((data) {
-      // ignore: avoid_print
+      print("nhận msg: $msg");
+      setMessage(
+        msg["id"],
+        msg["author"],
+        msg["partition"],
+        msg['isGroup'] == 'true' ? true : false,
+        msg["type"],
+        msg["text"],
+        msg['size'] == null ? 0 : int.parse(msg['size']),
+        msg["reply"] ?? "",
+      );
 
-      socket.on("message", (msg) {
-        // ignore: avoid_print
-        print("nhận msg: $msg");
-
-        setMessage(
-          msg["author"],
-          msg["partition"],
-          msg['isGroup'],
-          msg["type"],
-          msg["text"],
-          msg['size'],
-          msg["reply"],
-        );
-
-        // if (_scrollController.hasClients) {
-        //   _scrollController.animateTo(
-        //       _scrollController.position.maxScrollExtent ?? 0.5,
-        //       duration: const Duration(milliseconds: 300),
-        //       curve: Curves.easeOut);
-        // }
-      });
-
-      // socket.on("calling", (msg) {
-      //   // ignore: avoid_print
-      //   print("Nhận cuộc gọi: $msg");
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => VideoCallScreen(
-      //         caller: sourceChat!.userName,
-      //         creceiver: widget.chatModel.userName,
-      //         callStatus: false,
-      //       ),
-      //     ),
-      //   );
-      // });
+      // if (_scrollController.hasClients) {
+      //   _scrollController.animateTo(
+      //       _scrollController.position.maxScrollExtent ?? 0.5,
+      //       duration: const Duration(milliseconds: 300),
+      //       curve: Curves.easeOut);
+      // }
     });
   }
 
@@ -598,6 +614,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     //local
 
     setMessage(
+        id,
         sourceChat!.userName,
         widget.chatModel.userName,
         widget.chatModel.isGroup,
@@ -608,6 +625,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
     //socket
     var data = {
+      "id": id,
       "author": sourceChat!.userName,
       "partition": widget.chatModel.userName,
       "isGroup": widget.chatModel.isGroup.toString(),
@@ -635,12 +653,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
       'timestamp': DateTime.now().toString(),
       "reply": reply != null ? reply!['id'] : "",
     };
-    var responseSend = await networkHandler.post1("/chatmessage/add", data);
+    // var responseSend = await networkHandler.post1("/chatmessage/add", data);
+    // // ignore: avoid_print
+    // print(responseSend);
+
+    String id = await _chatMessagesViewModel.addChatMessageWithBody(data);
     // ignore: avoid_print
-    print(responseSend);
+    print(id);
 
     //local
     ChatMessagesModel messageModel = ChatMessagesModel(
+      id: id,
       author: sourceChat!.userName,
       partition: widget.chatModel.userName,
       isGroup: widget.chatModel.isGroup,
@@ -651,7 +674,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
       reply: reply != null ? reply!['id'] : "",
       // DateTime.now().toString().substring(11, 16),
     );
-
     if (mounted) {
       setState(() {
         // messages.insert(0, messageModel);
@@ -660,6 +682,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
 
     //socket
+    data["id"] = id;
     socket.emit("message", data);
 
     setState(() {
@@ -677,6 +700,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
     try {
       setMessage(
+          "",
           sourceChat!.userName,
           widget.chatModel.userName,
           widget.chatModel.isGroup,
@@ -698,50 +722,120 @@ class _ConversationScreenState extends State<ConversationScreen> {
       // print(data['path']);
 
       //send DB
-      Map<String, String> dataMap = {
+      String id = await _chatMessagesViewModel.addChatMessage(
+          sourceChat!.userName,
+          widget.chatModel.userName,
+          widget.chatModel.isGroup,
+          "image",
+          data['path'],
+          DateTime.now(),
+          reply != null ? reply!['id'] ?? "" : "");
+      // ignore: avoid_print
+      print(id);
+      // print(responseSend);
+
+      var message = {
+        "id": id,
         "author": sourceChat!.userName,
         "partition": widget.chatModel.userName,
         "isGroup": widget.chatModel.isGroup.toString(),
         "type": "image",
         "text": data['path'],
         'timestamp': DateTime.now().toString(),
-        "reply": reply != null ? reply!['id'] ?? "" : "",
+        "reply": reply != null ? reply!['id'] : "",
       };
-      await networkHandler.post("/chatmessage/add", dataMap);
-      // print(responseSend);
 
-      //send Socket
-      socket.emit("message", {
-        "sourceId": sourceChat!.userName,
-        "targetId": widget.chatModel.userName,
-        "type": "image",
-        "text": data['path'],
-        "reply": reply != null ? reply!['id'] ?? "" : "",
-      });
+      socket.emit("message", message);
     } catch (e) {
       // ignore: avoid_print
       print(e);
     }
   }
 
-  void setMessage(String author, String partition, bool? isGroup, String type,
-      String text, int? size, String reply) {
+  void onVideoSend(String path) async {
+    for (var i = 0; i < popTime; i++) {
+      Navigator.pop(context);
+    }
+    setState(() {
+      popTime = 0;
+    });
+
+    try {
+      //add Image
+      VideoViewModel videoViewModel = VideoViewModel();
+      String videoPath = await videoViewModel.uploadVideo(path);
+      // print(data['path']);
+
+      //send DB
+      String id = await _chatMessagesViewModel.addChatMessage(
+          sourceChat!.userName,
+          widget.chatModel.userName,
+          widget.chatModel.isGroup,
+          "video",
+          videoPath,
+          DateTime.now(),
+          reply != null ? reply!['id'] ?? "" : "");
+
+      print("addChatMessage id $id");
+      setMessage(
+          id,
+          sourceChat!.userName,
+          widget.chatModel.userName,
+          widget.chatModel.isGroup,
+          "video",
+          path,
+          null,
+          reply != null ? reply!['id'] ?? "" : "");
+      print("setMessage id $path");
+      var message = {
+        "id": id,
+        "author": sourceChat!.userName,
+        "partition": widget.chatModel.userName,
+        "isGroup": widget.chatModel.isGroup.toString(),
+        "type": "video",
+        "text": videoPath.toString(),
+        'timestamp': DateTime.now().toString(),
+        "reply": reply != null ? reply!['id'] : "",
+      };
+      try {
+        socket.emit("message", message);
+        print("socket $message");
+      } catch (e) {
+        print(e);
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+  }
+
+  void setMessage(String id, String author, String partition, bool? isGroup,
+      String type, String text, int? size, String reply) {
     ChatMessagesModel messageModel = ChatMessagesModel(
+      id: id,
       author: author,
       partition: partition,
       isGroup: isGroup,
       type: type,
       text: text,
-      size: size,
+      size: size ?? 0,
       timestamp: DateTime.now(),
       reply: reply,
     );
 
-    if (mounted) {
-      setState(() {
-        messages = [messageModel, ...messages];
-      });
-    }
+    // if (mounted) {
+    //   setState(() {
+    //     messages = [messageModel, ...messages];
+    //   });
+    // }
+    setState(() {
+      messages = [messageModel, ...messages];
+    });
+
+    // print("test");
+    // print(messages[0].text);
+    // print(messages[1].text);
+    // print(messages[2].text);
   }
 
   Future<void> setRelationship(String userRela, String chatterRela) async {
@@ -785,40 +879,52 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget ketBan() {
     return InkWell(
       onTap: () async {
-        if (relationship == "Kết bạn") {
-          setRelationship("Đã gửi lời mời kết bạn", "Chấp nhận");
+        if (relationship == Friend.nguoiLa) {
+          setRelationship(Friend.daGui, Friend.duocNhan);
+          await sendMessage("Notification",
+              "${sourceChat == null ? "" : sourceChat!.displayName} đã gửi lời mời kết bạn");
           setState(() {
-            relationship = "Đã gửi lời mời kết bạn";
+            relationship = Friend.daGui;
           });
         } else {
-          if (relationship == "Chấp nhận") {
-            setRelationship("Bạn bè", "Bạn bè");
+          if (relationship == Friend.duocNhan) {
+            setRelationship(Friend.banBe, Friend.banBe);
+            await sendMessage("Notification",
+                "${sourceChat == null ? "" : sourceChat!.displayName} đã chấp nhận lời mời kết bạn");
             setState(() {
-              relationship = "Bạn bè";
+              relationship = Friend.banBe;
             });
           } else {
-            if (relationship == "Đã gửi lời mời kết bạn") {
-              setRelationship("Người lạ", "Người lạ");
+            if (relationship == Friend.daGui) {
+              setRelationship(Friend.nguoiLa, Friend.nguoiLa);
+              await sendMessage("Notification",
+                  "${sourceChat == null ? "" : sourceChat!.displayName} đã hủy lời mời kết bạn");
               setState(() {
-                relationship = "Kết bạn";
+                relationship = Friend.nguoiLa;
               });
             }
           }
         }
       },
       child: Container(
-        color: Colors.white,
+        color: Colors.grey.shade100,
         height: 40,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
               Icons.person_add_alt_outlined,
-              color: Colors.grey,
+              color: Colors.black,
             ),
             const SizedBox(width: 5),
             Text(
-              relationship == "Người lạ" ? "Kết bạn" : relationship,
+              relationship == Friend.nguoiLa
+                  ? "Kết bạn"
+                  : relationship == Friend.daGui
+                      ? "Đã gửi lời mời"
+                      : relationship == Friend.duocNhan
+                          ? "Chấp nhận lời mời"
+                          : "",
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -847,7 +953,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   iconcreation(
                     Icons.insert_drive_file,
                     Colors.indigo,
-                    'Document',
+                    'Tài liệu',
                     () async {
                       result = await FilePicker.platform.pickFiles(
                         allowMultiple: true,
@@ -886,16 +992,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   iconcreation(
                     Icons.camera_alt,
                     Colors.pink,
-                    'Camera',
-                    () {
+                    'Video',
+                    () async {
                       setState(() {
-                        popTime = 3;
+                        popTime = 2;
                       });
+                      XFile fileVideo = (await _picker.pickVideo(
+                          source: ImageSource.gallery))!;
+                      // ignore: use_build_context_synchronously
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (builder) => CameraScreen(
-                            onImageSend: onImageSend,
+                          builder: (builder) => VideoViewPage(
+                            path: fileVideo.path,
+                            onVideoSend: onVideoSend,
                           ),
                         ),
                       );
@@ -905,7 +1015,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   iconcreation(
                     Icons.insert_photo,
                     Colors.purple,
-                    'Gallery',
+                    'Hình ảnh',
                     () async {
                       setState(() {
                         popTime = 2;
@@ -932,7 +1042,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  iconcreation(Icons.headset, Colors.orange, 'Audio', () async {
+                  iconcreation(Icons.headset, Colors.orange, 'Âm thanh',
+                      () async {
                     var result = await FilePicker.platform
                         .pickFiles(type: FileType.audio);
                     if (result != null) {
@@ -947,12 +1058,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     Navigator.pop(context);
                   }),
                   const SizedBox(width: 40),
-                  iconcreation(Icons.location_pin, Colors.teal, 'Location', () {
+                  iconcreation(
+                      Icons.location_pin, const Color(0xFF00f2ea), 'Vị trí',
+                      () {
                     Navigator.pop(context);
                     _navigateMapAndChoose();
                   }),
                   const SizedBox(width: 40),
-                  iconcreation(Icons.person, Colors.blue, 'Contact', () {}),
+                  iconcreation(Icons.person, Colors.blue, 'Liên hệ', () {}),
                 ],
               ),
             ],

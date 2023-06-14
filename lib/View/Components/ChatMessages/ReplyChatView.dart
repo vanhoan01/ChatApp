@@ -56,7 +56,10 @@ class _ReplyChatViewState extends State<ReplyChatView> {
                     },
                     onTapDown: (details) => _getTapPosition(details),
                     child: MessagesTextView(
-                        text: widget.chatMM.text, reply: false),
+                      text: widget.chatMM.text,
+                      reply: false,
+                      color: true,
+                    ),
                   ),
                 ),
               ),

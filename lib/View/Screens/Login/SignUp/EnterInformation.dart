@@ -32,7 +32,7 @@ class _EnterInformationState extends State<EnterInformation> {
 
   bool loading = false;
   final ImagePicker _picker = ImagePicker();
-  IconData iconphoto = Icons.camera_alt;
+  IconData iconphoto = Icons.add_a_photo;
   PickedFile? _imageFile;
 
   ImageViewModel? imageViewModel;
@@ -46,25 +46,35 @@ class _EnterInformationState extends State<EnterInformation> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 27,
+            color: Colors.black,
+          ),
+        ),
+        title: const Text(
           "Thông tin hồ sơ",
           style: TextStyle(
-            color: Colors.teal[800],
+            color: Colors.black,
             fontWeight: FontWeight.w500,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              size: 27,
-              color: Colors.black,
-            ),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {
+        //       Navigator.pop(context);
+        //     },
+        //     icon: const Icon(
+        //       Icons.arrow_back,
+        //       size: 27,
+        //       color: Colors.black,
+        //     ),
+        //   ),
+        // ],
       ),
       body: Container(
         padding:
@@ -92,7 +102,7 @@ class _EnterInformationState extends State<EnterInformation> {
                     radius: 50,
                     backgroundColor: Colors.grey[200],
                     child: Icon(
-                      Icons.add_a_photo,
+                      iconphoto,
                       size: 50,
                       color: Colors.blueGrey[500],
                     ),
@@ -103,7 +113,7 @@ class _EnterInformationState extends State<EnterInformation> {
                   decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.teal,
+                        color: Colors.blue,
                         width: 1.6,
                       ),
                     ),
@@ -137,7 +147,7 @@ class _EnterInformationState extends State<EnterInformation> {
                   decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.teal,
+                        color: Colors.blue,
                         width: 1.6,
                       ),
                     ),
@@ -172,7 +182,7 @@ class _EnterInformationState extends State<EnterInformation> {
                   decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.teal,
+                        color: Colors.blue,
                         width: 1.6,
                       ),
                     ),
@@ -207,7 +217,7 @@ class _EnterInformationState extends State<EnterInformation> {
                   decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.teal,
+                        color: Colors.blue,
                         width: 1.6,
                       ),
                     ),
@@ -238,7 +248,7 @@ class _EnterInformationState extends State<EnterInformation> {
                   },
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.teal),
+                        MaterialStateProperty.all<Color>(Colors.blue),
                     padding: MaterialStateProperty.all<EdgeInsets>(
                         const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10)),

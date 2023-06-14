@@ -14,7 +14,7 @@ class NameEditScreen extends StatefulWidget {
 class _NameEditScreenState extends State<NameEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  Color colorSave = Colors.white70;
+  Color colorSave = Colors.black54;
   @override
   void initState() {
     super.initState();
@@ -27,17 +27,18 @@ class _NameEditScreenState extends State<NameEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: TextButton(
           child: const Text(
             "Hủy",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.black),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Center(
             child: Text(
           "Sửa tên",
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16, color: Colors.black),
         )),
         actions: [
           TextButton(
@@ -77,14 +78,17 @@ class _NameEditScreenState extends State<NameEditScreen> {
                     borderSide: BorderSide(
                         width: 1, color: Color.fromRGBO(224, 224, 224, 1)),
                   ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue),
+                  ),
                   hintText: 'Nhập tên',
                 ),
                 autofocus: true,
                 onChanged: (value) {
                   setState(() {
                     _nameController.text == widget.displayName
-                        ? colorSave = Colors.white70
-                        : colorSave = Colors.white;
+                        ? colorSave = Colors.black54
+                        : colorSave = Colors.black;
                   });
                 },
               ),

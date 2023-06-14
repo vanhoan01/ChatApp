@@ -4,7 +4,7 @@ import 'package:chatapp/Model/List/ListChatterModel.dart';
 import 'package:chatapp/Model/Model/ChatterModel.dart';
 import 'package:chatapp/View/Components/CustomUI/ButtonCard.dart';
 import 'package:chatapp/View/Components/CustomUI/ContactCard.dart';
-import 'package:chatapp/View/Screens/CreateGroup.dart';
+import 'package:chatapp/View/Screens/Group/CreateGroup.dart';
 import 'package:chatapp/View/Screens/SearchScreen.dart';
 import 'package:chatapp/Data/Services/network_handler.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +54,13 @@ class _SelectContactState extends State<SelectContact> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +90,8 @@ class _SelectContactState extends State<SelectContact> {
           ),
           PopupMenuButton<String>(
             offset: const Offset(-20, 45),
-            color: Colors.black,
+            color: Colors.white,
+            icon: const Icon(Icons.more_vert, color: Colors.black),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(5.0),
@@ -122,8 +130,10 @@ class _SelectContactState extends State<SelectContact> {
           if (index == 0) {
             return InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (builder) => CreateGroup()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (builder) => const CreateGroup()));
                 // print('hihi');
               },
               child: const ButtonCard(icon: Icons.group, name: 'Nhóm mới'),

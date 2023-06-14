@@ -35,13 +35,30 @@ class _ThumbnailVideoState extends State<ThumbnailVideo> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: _thumbnailUrl != null
-          ? Image.file(
-              File(_thumbnailUrl!),
-              fit: BoxFit.cover,
-            )
-          : Image.asset('assets/images/thumbnailvideo.png'),
+    return Center(
+      child: Stack(children: [
+        InkWell(
+          child: _thumbnailUrl != null
+              ? Image.file(
+                  File(_thumbnailUrl!),
+                  fit: BoxFit.cover,
+                )
+              : Image.asset('assets/images/thumbnailvideo.png'),
+        ),
+        Positioned.fill(
+          child: Align(
+              alignment: Alignment.center,
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(width: 2, color: Colors.white)),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                ),
+              )),
+        ),
+      ]),
     );
   }
 }

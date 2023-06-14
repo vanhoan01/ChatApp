@@ -13,6 +13,8 @@ class ChatterModel {
       this.avatarImage,
       this.lastSeenAt,
       this.precense,
+      this.link,
+      this.biography,
       this.select});
   final String? partition;
   final String userName;
@@ -20,6 +22,8 @@ class ChatterModel {
   final String? avatarImage;
   final DateTime? lastSeenAt;
   final String? precense;
+  final String? link;
+  final String? biography;
   bool? select;
 
   // void set select(int select) {
